@@ -67,8 +67,10 @@ function BraceConnector({
                     x={labelPosition.x}
                     y={labelPosition.y}
                     orientation={invertOrientation(labelOrientation)}
-                    size={fontSize + 2}
+                    size={fontSize}
+                    lineWidth={lineWidth}
                     color="white"
+                    outline={1}
                 />
             )}
             <Path directions={pathDirections} lineWidth={lineWidth} color={color} />
@@ -78,6 +80,7 @@ function BraceConnector({
                     y={labelPosition.y}
                     orientation={invertOrientation(labelOrientation)}
                     size={fontSize}
+                    lineWidth={lineWidth}
                     color={color}
                 />
             )}
