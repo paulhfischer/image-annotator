@@ -6,37 +6,73 @@ interface TriangleProps {
     y: number;
     orientation: Orientation;
     size: number;
+    lineWidth: number;
     color: string;
+    outline?: number;
 }
-function Triangle({ x, y, orientation, size, color }: TriangleProps): ReactElement {
-    const angle = useMemo(() => {
+function Triangle({
+    x,
+    y,
+    orientation,
+    size,
+    lineWidth,
+    color,
+    outline,
+}: TriangleProps): ReactElement {
+    const points = useMemo(() => {
+        const pts: string[] = [];
+
         switch (orientation) {
             case 'top':
-                return 30;
+                // base
+                pts.push(`${x - size / 2},${y + size}`);
+                pts.push(`${x + size / 2},${y + size}`);
+                // tip
+                pts.push(`${x + lineWidth / 2},${y}`);
+                pts.push(`${x - lineWidth / 2},${y}`);
+                break;
             case 'right':
-                return 0;
+                // base
+                pts.push(`${x - size},${y - size / 2}`);
+                pts.push(`${x - size},${y + size / 2}`);
+                // tip
+                pts.push(`${x},${y + lineWidth / 2}`);
+                pts.push(`${x},${y - lineWidth / 2}`);
+                break;
             case 'bottom':
-                return 90;
+                // base
+                pts.push(`${x - size / 2},${y - size}`);
+                pts.push(`${x + size / 2},${y - size}`);
+                // tip
+                pts.push(`${x + lineWidth / 2},${y}`);
+                pts.push(`${x - lineWidth / 2},${y}`);
+                break;
             case 'left':
-                return 60;
+                // base
+                pts.push(`${x + size},${y - size / 2}`);
+                pts.push(`${x + size},${y + size / 2}`);
+                // tip
+                pts.push(`${x},${y + lineWidth / 2}`);
+                pts.push(`${x},${y - lineWidth / 2}`);
+                break;
             default:
                 throw new Error();
         }
-    }, [orientation]);
-
-    const points = useMemo(() => {
-        const pts: string[] = [];
-        for (let i = 0; i < 3; i += 1) {
-            const rad = (angle + 120 * i) * (Math.PI / 180);
-            const px = x + (size / 2) * Math.cos(rad);
-            const py = y + (size / 2) * Math.sin(rad);
-            pts.push(`${Math.round(px)},${Math.round(py)}`);
-        }
 
         return pts;
-    }, [angle, x, y, size]);
+    }, [orientation, x, y, size, lineWidth]);
 
-    return <polygon points={points.join(' ')} fill={color} />;
+    return (
+        <polygon
+            points={points.join(' ')}
+            fill={color}
+            stroke={outline ? color : undefined}
+            strokeWidth={outline}
+        />
+    );
 }
+Triangle.defaultProps = {
+    outline: undefined,
+};
 
 export default Triangle;
