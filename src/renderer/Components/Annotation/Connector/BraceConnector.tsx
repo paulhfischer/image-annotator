@@ -1,6 +1,7 @@
 import React, { ReactElement, useMemo } from 'react';
 import Path, { PathDirection } from './common/Path';
-import { Orientation, Vector, braceVectors } from './common/utils';
+import Triangle from './common/Triangle';
+import { Orientation, Vector, braceVectors, invertOrientation } from './common/utils';
 
 export interface BraceConnectorProps {
     pointA: Vector;
@@ -10,6 +11,9 @@ export interface BraceConnectorProps {
     orientation: Orientation;
     lineWidth: number;
     color: string;
+    labelOrientation: Orientation;
+    fontSize: number;
+    endMarker?: boolean;
 }
 
 function BraceConnector({
@@ -20,6 +24,9 @@ function BraceConnector({
     orientation,
     lineWidth,
     color,
+    labelOrientation,
+    fontSize,
+    endMarker,
 }: BraceConnectorProps): ReactElement {
     const pathDirections: PathDirection[] = useMemo(() => {
         const { start, tip, end, s, q1, q2, c, q3, q4, e } = braceVectors(
@@ -55,9 +62,30 @@ function BraceConnector({
     return (
         <>
             <Path directions={pathDirections} lineWidth={lineWidth + 2} color="white" />
+            {endMarker && (
+                <Triangle
+                    x={labelPosition.x}
+                    y={labelPosition.y}
+                    orientation={invertOrientation(labelOrientation)}
+                    size={fontSize + 2}
+                    color="white"
+                />
+            )}
             <Path directions={pathDirections} lineWidth={lineWidth} color={color} />
+            {endMarker && (
+                <Triangle
+                    x={labelPosition.x}
+                    y={labelPosition.y}
+                    orientation={invertOrientation(labelOrientation)}
+                    size={fontSize}
+                    color={color}
+                />
+            )}
         </>
     );
 }
+BraceConnector.defaultProps = {
+    endMarker: false,
+};
 
 export default BraceConnector;
