@@ -2,7 +2,8 @@ import { NodeType } from '@common/types';
 import React, { ReactElement, useMemo } from 'react';
 import Dot from './common/Dot';
 import Path, { PathDirection } from './common/Path';
-import { Vector } from './common/utils';
+import Triangle from './common/Triangle';
+import { Orientation, Vector, invertOrientation } from './common/utils';
 
 export interface LineConnectorProps {
     endNodes: NodeType[];
@@ -10,6 +11,10 @@ export interface LineConnectorProps {
     labelPosition: Vector;
     lineWidth: number;
     color: string;
+    labelOrientation: Orientation;
+    fontSize: number;
+    startMarker?: boolean;
+    endMarker?: boolean;
 }
 
 function LineConnector({
@@ -18,6 +23,10 @@ function LineConnector({
     labelPosition,
     lineWidth,
     color,
+    labelOrientation,
+    fontSize,
+    startMarker,
+    endMarker,
 }: LineConnectorProps): ReactElement {
     const pathDirections: PathDirection[] = useMemo(() => {
         const directions: PathDirection[] = [];
@@ -47,15 +56,45 @@ function LineConnector({
     return (
         <>
             <Path directions={pathDirections} lineWidth={lineWidth + 2} color="white" />
-            {endNodes.map((node) => (
-                <Dot key={node.id} x={node.x} y={node.y} radius={lineWidth * 2 + 1} color="white" />
-            ))}
+            {startMarker &&
+                endNodes.map((node) => (
+                    <Dot
+                        key={node.id}
+                        x={node.x}
+                        y={node.y}
+                        radius={lineWidth * 2 + 1}
+                        color="white"
+                    />
+                ))}
+            {endMarker && (
+                <Triangle
+                    x={labelPosition.x}
+                    y={labelPosition.y}
+                    orientation={invertOrientation(labelOrientation)}
+                    size={fontSize + 2}
+                    color="white"
+                />
+            )}
             <Path directions={pathDirections} lineWidth={lineWidth} color={color} />
-            {endNodes.map((node) => (
-                <Dot key={node.id} x={node.x} y={node.y} radius={lineWidth * 2} color={color} />
-            ))}
+            {startMarker &&
+                endNodes.map((node) => (
+                    <Dot key={node.id} x={node.x} y={node.y} radius={lineWidth * 2} color={color} />
+                ))}
+            {endMarker && (
+                <Triangle
+                    x={labelPosition.x}
+                    y={labelPosition.y}
+                    orientation={invertOrientation(labelOrientation)}
+                    size={fontSize}
+                    color={color}
+                />
+            )}
         </>
     );
 }
+LineConnector.defaultProps = {
+    startMarker: false,
+    endMarker: false,
+};
 
 export default LineConnector;

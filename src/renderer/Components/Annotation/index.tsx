@@ -45,6 +45,7 @@ interface AnnotationProps {
     imageWidth: number;
     imageHeight: number;
     maxLabelWidth: number;
+    render: boolean;
 }
 
 function Annotation({
@@ -56,6 +57,7 @@ function Annotation({
     imageWidth,
     imageHeight,
     maxLabelWidth,
+    render,
 }: AnnotationProps): ReactElement {
     const labelPosition = useMemo(
         () => getLabelVector(annotation, imageWidth, imageHeight),
@@ -66,16 +68,22 @@ function Annotation({
         case 'line':
             return (
                 <g id={id.toString()} className={annotation.permanent ? 'permanent' : undefined}>
-                    <g className="connector">
-                        <Connector
-                            type="line"
-                            endNodes={annotation.endNodes}
-                            connectionNode={annotation.connectionNode}
-                            labelPosition={labelPosition}
-                            lineWidth={lineWidth}
-                            color={color}
-                        />
-                    </g>
+                    {!annotation.permanent && (
+                        <g className="marker" style={render ? undefined : { display: 'none' }}>
+                            <Connector
+                                type="line"
+                                endNodes={annotation.endNodes}
+                                connectionNode={annotation.connectionNode}
+                                labelPosition={labelPosition}
+                                lineWidth={lineWidth}
+                                color="red"
+                                labelOrientation={annotation.labelPosition}
+                                fontSize={fontSize}
+                                startMarker
+                                endMarker
+                            />
+                        </g>
+                    )}
                     <g className="label">
                         <Label
                             position={labelPosition}
@@ -85,13 +93,49 @@ function Annotation({
                             color={color}
                             maxWidth={maxLabelWidth}
                         />
+                        <Connector
+                            type="line"
+                            endNodes={annotation.endNodes}
+                            connectionNode={annotation.connectionNode}
+                            labelPosition={labelPosition}
+                            lineWidth={lineWidth}
+                            color={color}
+                            labelOrientation={annotation.labelPosition}
+                            fontSize={fontSize}
+                            startMarker
+                        />
                     </g>
                 </g>
             );
         case 'brace':
             return (
                 <g id={id.toString()}>
-                    <g className="connector">
+                    {!annotation.permanent && (
+                        <g className="marker" style={render ? undefined : { display: 'none' }}>
+                            <Connector
+                                type="brace"
+                                pointA={annotation.nodeA}
+                                connectionNode={annotation.connectionNode}
+                                pointB={annotation.nodeB}
+                                labelPosition={labelPosition}
+                                orientation={annotation.labelPosition}
+                                lineWidth={lineWidth}
+                                color="red"
+                                labelOrientation={annotation.labelPosition}
+                                fontSize={fontSize}
+                                endMarker
+                            />
+                        </g>
+                    )}
+                    <g className="label">
+                        <Label
+                            position={labelPosition}
+                            orientation={annotation.labelPosition}
+                            value={annotation.label || `unnamed-${annotation.id}`}
+                            fontSize={fontSize}
+                            color={color}
+                            maxWidth={maxLabelWidth}
+                        />
                         <Connector
                             type="brace"
                             pointA={annotation.nodeA}
@@ -101,16 +145,8 @@ function Annotation({
                             orientation={annotation.labelPosition}
                             lineWidth={lineWidth}
                             color={color}
-                        />
-                    </g>
-                    <g className="label">
-                        <Label
-                            position={labelPosition}
-                            orientation={annotation.labelPosition}
-                            value={annotation.label || `unnamed-${annotation.id}`}
+                            labelOrientation={annotation.labelPosition}
                             fontSize={fontSize}
-                            color={color}
-                            maxWidth={maxLabelWidth}
                         />
                     </g>
                 </g>

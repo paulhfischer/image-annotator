@@ -7,11 +7,12 @@ type ConnectorProps =
     | (BraceConnectorProps & { type: 'brace' });
 
 function Connector(connector: ConnectorProps): ReactElement {
-    const { type, labelPosition, lineWidth, color } = connector;
+    const { type, labelPosition, lineWidth, color, labelOrientation, fontSize, endMarker } =
+        connector;
 
     switch (type) {
         case 'line': {
-            const { endNodes, connectionNode } = connector;
+            const { endNodes, connectionNode, startMarker } = connector;
 
             return (
                 <LineConnector
@@ -20,6 +21,10 @@ function Connector(connector: ConnectorProps): ReactElement {
                     labelPosition={labelPosition}
                     lineWidth={lineWidth}
                     color={color}
+                    labelOrientation={labelOrientation}
+                    fontSize={fontSize}
+                    startMarker={startMarker}
+                    endMarker={endMarker}
                 />
             );
         }
@@ -35,6 +40,9 @@ function Connector(connector: ConnectorProps): ReactElement {
                     orientation={orientation}
                     lineWidth={lineWidth}
                     color={color}
+                    labelOrientation={labelOrientation}
+                    fontSize={fontSize}
+                    endMarker={endMarker}
                 />
             );
         }
