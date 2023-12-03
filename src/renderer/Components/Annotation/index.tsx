@@ -42,6 +42,7 @@ interface AnnotationProps {
     color: string;
     imageWidth: number;
     imageHeight: number;
+    maxLabelWidth: number;
 }
 
 function Annotation({
@@ -52,6 +53,7 @@ function Annotation({
     color,
     imageWidth,
     imageHeight,
+    maxLabelWidth,
 }: AnnotationProps): ReactElement {
     const labelPosition = useMemo(
         () => getLabelVector(annotation, imageWidth, imageHeight),
@@ -79,6 +81,7 @@ function Annotation({
                             value={annotation.label || `unnamed-${annotation.id}`}
                             fontSize={fontSize}
                             color={color}
+                            maxWidth={maxLabelWidth}
                         />
                     </g>
                 </g>
@@ -105,6 +108,7 @@ function Annotation({
                             value={annotation.label || `unnamed-${annotation.id}`}
                             fontSize={fontSize}
                             color={color}
+                            maxWidth={maxLabelWidth}
                         />
                     </g>
                 </g>
