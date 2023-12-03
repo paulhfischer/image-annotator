@@ -40,6 +40,62 @@ export const orthogonalVector = (vector: Vector): Vector => {
     };
 };
 
+export const invertOrientation = (orientation: Orientation): Orientation => {
+    switch (orientation) {
+        case 'top':
+            return 'bottom';
+        case 'right':
+            return 'left';
+        case 'bottom':
+            return 'top';
+        case 'left':
+            return 'right';
+        default:
+            throw new Error();
+    }
+};
+
+export const orientationToAngle = (orientation: Orientation): number => {
+    switch (orientation) {
+        case 'top':
+            return 180;
+        case 'right':
+            return 270;
+        case 'bottom':
+            return 0;
+        case 'left':
+            return 90;
+        default:
+            throw new Error();
+    }
+};
+
+export const rotateVector = ({ x, y }: Vector, center: Vector, rotationDeg: number): Vector => {
+    const rotationRad = (rotationDeg * Math.PI) / 180;
+
+    return {
+        x:
+            center.x +
+            (x - center.x) * Math.cos(rotationRad) -
+            (y - center.y) * Math.sin(rotationRad),
+        y:
+            center.y +
+            (x - center.x) * Math.sin(rotationRad) +
+            (y - center.y) * Math.cos(rotationRad),
+    };
+};
+
+export const angleDeg = (vectorA: Vector, vectorB: Vector): number => {
+    const dy = vectorB.y - vectorA.y;
+    const dx = vectorB.x - vectorA.x;
+
+    const rad = Math.atan2(dy, dx);
+    const deg = (rad * 180) / Math.PI;
+    const adjustedDeg = (deg + 360) % 360;
+
+    return (adjustedDeg + 90) % 360;
+};
+
 export const braceVectors = (
     pointA: Vector,
     pointB: Vector,

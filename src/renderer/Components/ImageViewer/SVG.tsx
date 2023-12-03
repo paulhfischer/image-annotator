@@ -121,6 +121,7 @@ const SVG = React.forwardRef<SVGSVGElement, SVGProps>(
                                 ? maxLabelWidth.tb
                                 : maxLabelWidth.lr
                         }
+                        render={!!render}
                     />
                 ))}
                 {nodes &&
