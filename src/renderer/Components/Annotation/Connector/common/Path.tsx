@@ -55,6 +55,8 @@ function Path({ directions, lineWidth, color }: PathProps): ReactElement {
             fill="none"
             stroke={color}
             strokeWidth={lineWidth}
+            strokeLinecap="round"
+            strokeLinejoin="round"
         />
     );
 }
