@@ -32,3 +32,18 @@ export const centerVector = (vectors: Vector[]): Vector => {
         y: Math.round(sumY / vectors.length),
     };
 };
+
+export const invertOrientation = (orientation: Orientation): Orientation => {
+    switch (orientation) {
+        case 'top':
+            return 'bottom';
+        case 'right':
+            return 'left';
+        case 'bottom':
+            return 'top';
+        case 'left':
+            return 'right';
+        default:
+            throw new Error();
+    }
+};
