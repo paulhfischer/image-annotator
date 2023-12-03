@@ -1,40 +1,90 @@
 import React, { ReactElement, useMemo } from 'react';
 import { Orientation, Vector } from './Connector/common/utils';
 
+const getTextWidth = (text: string, fontSize: number, fontFamily: string) => {
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+
+    if (!context) throw new Error();
+
+    context.font = `${fontSize}px ${fontFamily}`;
+
+    return context.measureText(text).width;
+};
+
 interface LabelProps {
     position: Vector;
     orientation: Orientation;
     value: string;
     color: string;
     fontSize: number;
+    maxWidth: number;
 }
 
-function Label({ position, orientation, value, color, fontSize }: LabelProps): ReactElement {
-    const lines: string[] = useMemo(() => value.split('\n'), [value]);
+function Label({
+    position,
+    orientation,
+    value,
+    color,
+    fontSize,
+    maxWidth,
+}: LabelProps): ReactElement {
+    const fontFamily = 'Avenir Next Condensed';
+
+    const padding = useMemo(() => fontSize / 2, [fontSize]);
+
+    const lines: string[] = useMemo(
+        () =>
+            value
+                .split('\n')
+                .map((line) => {
+                    const words = line.split(' ');
+
+                    const trimmedLine: string[][] = [[]];
+
+                    words.forEach((word) => {
+                        const currentLine = trimmedLine[trimmedLine.length - 1];
+
+                        if (
+                            getTextWidth([...currentLine, word].join(' '), fontSize, fontFamily) >
+                            maxWidth - padding
+                        ) {
+                            trimmedLine.push([word]);
+                        } else {
+                            trimmedLine[trimmedLine.length - 1].push(word);
+                        }
+                    });
+
+                    return trimmedLine;
+                })
+                .flat()
+                .map((line) => line.join(' ')),
+        [value, fontSize, maxWidth, padding],
+    );
 
     const transform: Vector = useMemo(() => {
         switch (orientation) {
             case 'top':
                 return {
                     x: position.x,
-                    y: position.y - (lines.length - 1) * fontSize - fontSize / 2,
+                    y: position.y - (lines.length - 1) * fontSize - padding,
                 };
             case 'right':
                 return {
-                    x: position.x + fontSize / 2,
+                    x: position.x + padding,
                     y: position.y - ((lines.length - 1) * fontSize) / 2,
                 };
             case 'bottom':
-                return { x: position.x, y: position.y + fontSize / 2 };
+                return { x: position.x, y: position.y + padding };
             case 'left':
                 return {
-                    x: position.x - fontSize / 2,
+                    x: position.x - padding,
                     y: position.y - ((lines.length - 1) * fontSize) / 2,
                 };
             default:
                 throw new Error();
         }
-    }, [lines, orientation, position, fontSize]);
+    }, [lines, orientation, position, fontSize, padding]);
 
     const textAnchor: string = useMemo(() => {
         switch (orientation) {
@@ -70,7 +120,7 @@ function Label({ position, orientation, value, color, fontSize }: LabelProps): R
         <text
             textAnchor={textAnchor}
             transform={`translate(${transform.x}, ${transform.y})`}
-            fontFamily="Avenir Next Condensed"
+            fontFamily={fontFamily}
             fill={color}
             fontSize={fontSize}
         >
