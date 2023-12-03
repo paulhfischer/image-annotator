@@ -8,6 +8,7 @@ import Annotation from '../Annotation';
 import Node from './Node';
 import {
     getAnnotationColor,
+    getBorder,
     getFontSize,
     getImageURL,
     getLineWidth,
@@ -72,6 +73,15 @@ const SVG = React.forwardRef<SVGSVGElement, SVGProps>(
             );
         }, [selectedImage]);
 
+        const maxLabelWidth = useMemo(() => {
+            if (!selectedImage) return { lr: 0, tb: 0 };
+
+            return {
+                lr: getBorder(selectedImage).x,
+                tb: selectedImage.meta.width + 2 * getBorder(selectedImage).x,
+            };
+        }, [selectedImage]);
+
         if (!selectedImage) {
             return <>no image selected</>;
         }
@@ -105,6 +115,12 @@ const SVG = React.forwardRef<SVGSVGElement, SVGProps>(
                         color={getAnnotationColor(annotation, selectedAnnotation, render)}
                         imageWidth={selectedImage.meta.width}
                         imageHeight={selectedImage.meta.height}
+                        maxLabelWidth={
+                            annotation.labelPosition === 'top' ||
+                            annotation.labelPosition === 'bottom'
+                                ? maxLabelWidth.tb
+                                : maxLabelWidth.lr
+                        }
                     />
                 ))}
                 {nodes &&
