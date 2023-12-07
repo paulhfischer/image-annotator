@@ -12,6 +12,7 @@ import {
     fetchImagesFromDB,
     updateImageInDB,
 } from './database/images';
+import migrate from './database/migrate';
 import { openImage } from './openImage';
 import saveFile from './saveFile';
 
@@ -55,7 +56,7 @@ const registerIpcEventListeners = () => {
         ) => saveFile(data),
     );
 
-    ipcMain.handle('fetchImagesFromDB', fetchImagesFromDB);
+    ipcMain.handle('fetchImagesFromDB', async () => fetchImagesFromDB());
     ipcMain.handle('fetchImageFromDB', async (_, { imageID }: { imageID: number }) =>
         fetchImageFromDB(imageID),
     );
@@ -80,6 +81,7 @@ const main = async (): Promise<void> => {
 
     await app.whenReady();
     await createDB();
+    await migrate();
 
     const mainWindow = createBrowserWindow();
     loadUI(mainWindow, app.isPackaged);

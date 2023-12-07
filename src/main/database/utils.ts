@@ -1,14 +1,9 @@
-import { app } from 'electron';
 import { join } from 'path';
 import { Database, RunResult } from 'sqlite3';
 
-const databasePath = app.isPackaged
-    ? join(app.getPath('userData'), 'database.db')
-    : join(__dirname, '..', 'app.db');
-
-export const runDB = (sql: string, params?: any[]): Promise<RunResult> => {
+export const runDB = (sql: string, params?: any[], path?: string): Promise<RunResult> => {
     return new Promise((resolve, reject) => {
-        const db = new Database(databasePath, (connectionError) => {
+        const db = new Database(path || join(__dirname, '..', 'app.db'), (connectionError) => {
             if (connectionError) {
                 reject(connectionError);
             }
@@ -24,9 +19,9 @@ export const runDB = (sql: string, params?: any[]): Promise<RunResult> => {
     });
 };
 
-export const queryDB = <T>(sql: string, params?: any[]): Promise<T[]> => {
+export const queryDB = <T>(sql: string, params?: any[], path?: string): Promise<T[]> => {
     return new Promise((resolve, reject) => {
-        const db = new Database(databasePath, (connectionError) => {
+        const db = new Database(path || join(__dirname, '..', 'app.db'), (connectionError) => {
             if (connectionError) {
                 reject(connectionError);
             }

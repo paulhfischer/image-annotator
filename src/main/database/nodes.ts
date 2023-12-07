@@ -16,18 +16,27 @@ const entryToType = (entry: NodeDBType): NodeType => {
     };
 };
 
-export const fetchNodeFromDB = async (nodeID: number): Promise<NodeType> => {
-    const nodesResult = await queryDB<NodeDBType>(`SELECT * FROM nodes WHERE id = ?`, [nodeID]);
+export const fetchNodeFromDB = async (nodeID: number, path?: string): Promise<NodeType> => {
+    const nodesResult = await queryDB<NodeDBType>(
+        `SELECT * FROM nodes WHERE id = ?`,
+        [nodeID],
+        path,
+    );
 
     if (nodesResult.length !== 1) throw new Error();
 
     return entryToType(nodesResult[0]);
 };
 
-export const fetchNodesFromDB = async (annotationID: number): Promise<NodeType[]> => {
-    const nodesResult = await queryDB<NodeDBType>(`SELECT * FROM nodes WHERE annotation = ?`, [
-        annotationID,
-    ]);
+export const fetchNodesFromDB = async (
+    annotationID: number,
+    path?: string,
+): Promise<NodeType[]> => {
+    const nodesResult = await queryDB<NodeDBType>(
+        `SELECT * FROM nodes WHERE annotation = ?`,
+        [annotationID],
+        path,
+    );
 
     return Promise.all(nodesResult.map((entry) => entryToType(entry)));
 };

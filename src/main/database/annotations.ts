@@ -34,7 +34,7 @@ const getUniqueAnnotationID = async (): Promise<string> => {
     return getUniqueAnnotationID();
 };
 
-const entryToType = async (entry: AnnotationDBType): Promise<AnnotationType> => {
+const entryToType = async (entry: AnnotationDBType, path?: string): Promise<AnnotationType> => {
     if (
         entry.label_position !== 'top' &&
         entry.label_position !== 'right' &&
@@ -45,8 +45,10 @@ const entryToType = async (entry: AnnotationDBType): Promise<AnnotationType> => 
     }
 
     const specialNode =
-        entry.special_node === null ? undefined : await fetchNodeFromDB(entry.special_node);
-    const nodes = (await fetchNodesFromDB(entry.id)).filter((node) => node.id !== specialNode?.id);
+        entry.special_node === null ? undefined : await fetchNodeFromDB(entry.special_node, path);
+    const nodes = (await fetchNodesFromDB(entry.id, path)).filter(
+        (node) => node.id !== specialNode?.id,
+    );
 
     switch (entry.type) {
         case 'line': {
@@ -93,13 +95,17 @@ export const fetchAnnotationFromDB = async (annotationID: number): Promise<Annot
     return entryToType(annotationsResult[0]);
 };
 
-export const fetchAnnotationsFromDB = async (imageID: number): Promise<AnnotationType[]> => {
+export const fetchAnnotationsFromDB = async (
+    imageID: number,
+    path?: string,
+): Promise<AnnotationType[]> => {
     const annotationsResult = await queryDB<AnnotationDBType>(
         `SELECT * FROM annotations WHERE image = ?`,
         [imageID],
+        path,
     );
 
-    return Promise.all(annotationsResult.map((entry) => entryToType(entry)));
+    return Promise.all(annotationsResult.map((entry) => entryToType(entry, path)));
 };
 
 export const createAnnotationInDB = async (

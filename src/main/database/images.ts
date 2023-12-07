@@ -27,7 +27,7 @@ const getUniqueImageID = async (): Promise<string> => {
     return getUniqueImageID();
 };
 
-const entryToType = async (entry: ImageDBType): Promise<ImageType> => {
+const entryToType = async (entry: ImageDBType, path?: string): Promise<ImageType> => {
     if (
         entry.annotation_size !== 'small' &&
         entry.annotation_size !== 'medium' &&
@@ -49,7 +49,7 @@ const entryToType = async (entry: ImageDBType): Promise<ImageType> => {
         },
         name: entry.name,
         annotationSize: entry.annotation_size,
-        annotations: await fetchAnnotationsFromDB(entry.id),
+        annotations: await fetchAnnotationsFromDB(entry.id, path),
     };
 };
 
@@ -61,10 +61,10 @@ export const fetchImageFromDB = async (imageID: number): Promise<ImageType> => {
     return entryToType(imagesResult[0]);
 };
 
-export const fetchImagesFromDB = async (): Promise<ImageType[]> => {
-    const imagesResult = await queryDB<ImageDBType>(`SELECT * FROM images`);
+export const fetchImagesFromDB = async (path?: string): Promise<ImageType[]> => {
+    const imagesResult = await queryDB<ImageDBType>(`SELECT * FROM images`, undefined, path);
 
-    return Promise.all(imagesResult.map((entry) => entryToType(entry)));
+    return Promise.all(imagesResult.map((entry) => entryToType(entry, path)));
 };
 
 export const createImageInDB = async (image: NewImageType): Promise<ImageType> => {
