@@ -67,6 +67,7 @@ function AnnotationEdit() {
         [selectedNodeID, selectedAnnotation],
     );
 
+    const annotationUIDID = useId();
     const annotationLabelID = useId();
     const annotationLabelPositionID = useId();
     const nodeXID = useId();
@@ -75,6 +76,18 @@ function AnnotationEdit() {
     if (!selectedImage || !selectedAnnotation) {
         return <></>; // eslint-disable-line react/jsx-no-useless-fragment
     }
+
+    const handleUpdateUID = (
+        event: ChangeEvent<HTMLInputElement>,
+        data: InputOnChangeData,
+    ): void => {
+        const updatedAnnotation = {
+            ...selectedAnnotation,
+            uid: data.value,
+        };
+
+        dispatch({ type: 'UPDATE_ANNOTATION', payload: updatedAnnotation });
+    };
 
     const handleUpdateLabel = (
         event: ChangeEvent<HTMLTextAreaElement>,
@@ -152,6 +165,17 @@ function AnnotationEdit() {
 
     return (
         <div className={classes.root}>
+            <div className={classes.row}>
+                <Label size="small" htmlFor={annotationUIDID}>
+                    uid
+                </Label>
+                <Input
+                    id={annotationUIDID}
+                    size="small"
+                    value={selectedAnnotation.uid}
+                    onChange={handleUpdateUID}
+                />
+            </div>
             <div className={classes.row}>
                 <Label size="small" htmlFor={annotationLabelID}>
                     label
