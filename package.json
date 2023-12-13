@@ -6,7 +6,7 @@
         "email": "paul.fischer@mailbox.org",
         "url": "https://github.com/paulhfischer"
     },
-    "version": "1.4.0",
+    "version": "1.5.0",
     "scripts": {
         "build": "vite build",
         "dev": "vite",
@@ -95,10 +95,10 @@
         "csv-stringify": "^6.4.4",
         "electron-dialog": "^2.0.0",
         "electron-unhandled": "^4.0.1",
-        "image-size": "^1.0.2",
         "papaparse": "^5.4.1",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
+        "sharp": "^0.33.0",
         "sqlite3": "^5.1.6"
     }
 }
