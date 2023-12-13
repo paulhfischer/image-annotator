@@ -13,7 +13,7 @@ const createAnkiCSV = (images: ImageType[]): string => {
                         annotation.permanent ? undefined : `{{c${index + 1}::${index + 1}}}`,
                     )
                     .filter((row) => row !== undefined)
-                    .join('<br>\n'),
+                    .join(''),
                 infos: '',
                 image: `<img src="${image.uid}.svg">`,
             };
