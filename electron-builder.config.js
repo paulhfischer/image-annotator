@@ -13,6 +13,8 @@ const config = {
     extraMetadata: {
         version: process.env.VITE_APP_VERSION,
     },
+    asar: true,
+    asarUnpack: ['**/node_modules/sharp/**/*', '**/node_modules/@img/**/*'],
     mac: {
         hardenedRuntime: true,
         gatekeeperAssess: false,
