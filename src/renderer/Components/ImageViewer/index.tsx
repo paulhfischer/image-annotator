@@ -21,9 +21,9 @@ export const useStyles = makeStyles({
         height: '100%',
         overflowX: 'auto',
         overflowY: 'auto',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        // display: 'flex',
+        // alignItems: 'center',
+        // justifyContent: 'center',
     },
 });
 
@@ -40,7 +40,11 @@ function ImageViewer(): ReactElement {
         [selectedImageID, images],
     );
 
-    const [zoomLevel, setZoomLevel] = useState<number>(1);
+    const [pos, setPos] = useState<{ x: number; y: number; scale: number }>({
+        x: 0,
+        y: 0,
+        scale: 1,
+    });
     const [nodes, setNodes] = useState<NewNodeType[]>([]);
     const [specialNode, setSpecialNode] = useState<NewNodeType>();
 
@@ -69,6 +73,44 @@ function ImageViewer(): ReactElement {
         [dispatch, nodes, selectedImage, specialNode],
     );
 
+    const handleScroll = (event: React.WheelEvent<HTMLDivElement>) => {
+        const xs = (event.clientX - pos.x) / pos.scale;
+        const ys = (event.clientY - pos.y) / pos.scale;
+        const delta = -event.deltaY;
+        const newScale = delta > 0 ? pos.scale * 1.1 : pos.scale / 1.1;
+        const pointX = event.clientX - xs * newScale;
+        const pointY = event.clientY - ys * newScale;
+        setPos({
+            x: pointX,
+            y: pointY,
+            scale: newScale,
+        });
+
+        // const newScale = Math.min(Math.max(pos.scale + event.deltaY * 0.01, 0.1), 3);
+
+        // const ratio = 1 - newScale / pos.scale;
+
+        // setPos({
+        //     x: pos.x + (event.clientX - pos.x) * ratio,
+        //     y: pos.y + (event.clientY - pos.y) * ratio,
+        //     scale: newScale,
+        // });
+
+        // const boundingRect = event.currentTarget.getBoundingClientRect();
+        // const offsetX = event.clientX - boundingRect.left;
+        // const offsetY = event.clientY - boundingRect.top;
+
+        // // Calculate the new mouse position relative to the SVG coordinates after zooming
+        // // const x = (offsetX - mousePosition.x) / zoom;
+        // // const y = (offsetY - mousePosition.y) / zoom;
+
+        // setPos({
+        //     x: offsetX,
+        //     y: offsetY,
+        //     scale: newZoom,
+        // });
+    };
+
     useEffect(() => {
         const handleKeyDown = async (event: KeyboardEvent) => {
             switch (event.key) {
@@ -83,15 +125,6 @@ function ImageViewer(): ReactElement {
                     break;
                 case 'ArrowRight':
                     await handleAddAnnotation('right');
-                    break;
-                case '+':
-                    setZoomLevel((currentLevel) => currentLevel + 0.1);
-                    break;
-                case '-':
-                    setZoomLevel((currentLevel) => Math.max(0.1, currentLevel - 0.1));
-                    break;
-                case '0':
-                    setZoomLevel(1);
                     break;
                 default:
                     break;
@@ -132,13 +165,13 @@ function ImageViewer(): ReactElement {
     };
 
     return (
-        <div className={classes.root}>
+        <div className={classes.root} onWheelCapture={handleScroll}>
             <SVG
                 nodes={nodes}
                 specialNode={specialNode}
                 handleClick={handleClick}
                 ref={SVGRef}
-                zoom={zoomLevel}
+                pos={pos}
             />
         </div>
     );

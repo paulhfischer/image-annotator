@@ -23,7 +23,6 @@ export const useStyles = makeStyles({
         maxHeight: '100%',
         width: 'auto',
         height: 'auto',
-        transformOrigin: 'top left',
     },
 });
 
@@ -33,18 +32,18 @@ type SVGProps =
           nodes: NewNodeType[];
           specialNode: NewNodeType | undefined;
           handleClick: (event: MouseEvent<SVGSVGElement>) => void;
-          zoom: number;
+          pos: { x: number; y: number; scale: number };
       }
     | {
           render: true;
           nodes?: undefined;
           specialNode?: undefined;
           handleClick?: undefined;
-          zoom?: undefined;
+          pos?: undefined;
       };
 
 const SVG = React.forwardRef<SVGSVGElement, SVGProps>(
-    ({ render, nodes, specialNode, handleClick, zoom }, ref): ReactElement => {
+    ({ render, nodes, specialNode, handleClick, pos }, ref): ReactElement => {
         const classes = useStyles();
 
         const {
@@ -89,7 +88,14 @@ const SVG = React.forwardRef<SVGSVGElement, SVGProps>(
         return (
             <svg
                 ref={ref}
-                style={render ? undefined : { transform: `scale(${zoom})` }}
+                style={
+                    render
+                        ? undefined
+                        : {
+                              transformOrigin: '0px 0px',
+                              transform: `scale(${pos.scale}) translate(${pos.x}px, ${pos.y}px)`,
+                          }
+                }
                 onClick={handleClick}
                 className={render ? undefined : classes.root}
                 viewBox={getViewBox(selectedImage)}
