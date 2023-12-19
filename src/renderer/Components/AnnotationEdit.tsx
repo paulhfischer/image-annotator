@@ -70,6 +70,7 @@ function AnnotationEdit() {
     const annotationUIDID = useId();
     const annotationLabelID = useId();
     const annotationLabelPositionID = useId();
+    const annotationTipTypeID = useId();
     const nodeXID = useId();
     const nodeYID = useId();
 
@@ -108,6 +109,18 @@ function AnnotationEdit() {
         const updatedAnnotation = {
             ...selectedAnnotation,
             labelPosition: data.value as 'top' | 'right' | 'bottom' | 'left',
+        };
+
+        dispatch({ type: 'UPDATE_ANNOTATION', payload: updatedAnnotation });
+    };
+
+    const handleUpdateTipType = async (
+        event: ChangeEvent<HTMLSelectElement>,
+        data: SelectOnChangeData,
+    ): Promise<void> => {
+        const updatedAnnotation = {
+            ...selectedAnnotation,
+            tipType: data.value as 'circle' | 'arrow',
         };
 
         dispatch({ type: 'UPDATE_ANNOTATION', payload: updatedAnnotation });
@@ -210,6 +223,20 @@ function AnnotationEdit() {
                     checked={selectedAnnotation.permanent}
                     onChange={handleUpdatePermanent}
                 />
+            </div>
+            <div className={classes.row}>
+                <Label size="small" htmlFor={annotationTipTypeID}>
+                    tip
+                </Label>
+                <Select
+                    size="small"
+                    id={annotationTipTypeID}
+                    value={selectedAnnotation.tipType}
+                    onChange={handleUpdateTipType}
+                >
+                    <option>circle</option>
+                    <option>arrow</option>
+                </Select>
             </div>
             <div className={classes.row}>
                 <Button size="small" onClick={handleDeleteAnnotation} icon={<DeleteIcon />}>

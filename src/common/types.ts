@@ -42,6 +42,7 @@ export type AnnotationType =
           endNodes: NodeType[];
           connectionNode?: NodeType;
           permanent: boolean;
+          tipType: 'circle' | 'arrow';
       }
     | {
           id: number;
@@ -53,6 +54,7 @@ export type AnnotationType =
           nodeB: NodeType;
           connectionNode?: NodeType;
           permanent: boolean;
+          tipType: 'circle' | 'arrow';
       };
 
 export type NewNodeType = {
