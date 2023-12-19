@@ -28,6 +28,8 @@ function BraceConnector({
     fontSize,
     endMarker,
 }: BraceConnectorProps): ReactElement {
+    const outline = useMemo(() => lineWidth / 2, [lineWidth]);
+
     const pathDirections: PathDirection[] = useMemo(() => {
         const { start, tip, end, s, q1, q2, c, q3, q4, e } = braceVectors(
             pointA,
@@ -61,7 +63,7 @@ function BraceConnector({
 
     return (
         <>
-            <Path directions={pathDirections} lineWidth={lineWidth + 2} color="white" />
+            <Path directions={pathDirections} size={lineWidth} outline={outline} color="white" />
             {endMarker && (
                 <Triangle
                     x={labelPosition.x}
@@ -70,10 +72,10 @@ function BraceConnector({
                     size={fontSize}
                     lineWidth={lineWidth}
                     color="white"
-                    outline={1}
+                    outline={outline}
                 />
             )}
-            <Path directions={pathDirections} lineWidth={lineWidth} color={color} />
+            <Path directions={pathDirections} size={lineWidth} color={color} />
             {endMarker && (
                 <Triangle
                     x={labelPosition.x}

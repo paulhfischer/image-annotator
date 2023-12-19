@@ -42,11 +42,11 @@ export const getImageURL = (image: ImageType, showOldAnnotations: boolean, rende
 export const getLineWidth = (image: ImageType) => {
     switch (image.annotationSize) {
         case 'small':
-            return 1;
-        case 'medium':
             return 2;
+        case 'medium':
+            return 4;
         case 'large':
-            return 3;
+            return 6;
         default:
             throw new Error();
     }
