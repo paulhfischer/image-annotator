@@ -41,3 +41,9 @@ export const queryDB = <T>(sql: string, params?: any[]): Promise<T[]> => {
         });
     });
 };
+
+export const hasColumn = async (table: string, column: string): Promise<boolean> => {
+    return queryDB<{ name: string }>(`PRAGMA table_info(${table})`).then(
+        (cols) => cols.find((col) => col.name === column) !== undefined,
+    );
+};

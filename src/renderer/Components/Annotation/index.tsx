@@ -79,6 +79,7 @@ function Annotation({
                                 color="red"
                                 labelOrientation={annotation.labelPosition}
                                 fontSize={fontSize}
+                                tipType={annotation.tipType}
                                 startMarker
                                 endMarker
                             />
@@ -102,6 +103,7 @@ function Annotation({
                             color={color}
                             labelOrientation={annotation.labelPosition}
                             fontSize={fontSize}
+                            tipType={annotation.tipType}
                             startMarker
                         />
                     </g>
