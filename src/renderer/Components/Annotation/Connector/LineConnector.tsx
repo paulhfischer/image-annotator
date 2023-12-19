@@ -28,6 +28,10 @@ function LineConnector({
     startMarker,
     endMarker,
 }: LineConnectorProps): ReactElement {
+    const tipSize = useMemo(() => lineWidth * 2, [lineWidth]);
+
+    const outline = useMemo(() => lineWidth / 2, [lineWidth]);
+
     const pathDirections: PathDirection[] = useMemo(() => {
         const directions: PathDirection[] = [];
 
@@ -55,15 +59,16 @@ function LineConnector({
 
     return (
         <>
-            <Path directions={pathDirections} lineWidth={lineWidth + 2} color="white" />
+            <Path directions={pathDirections} size={lineWidth} outline={outline} color="white" />
             {startMarker &&
                 endNodes.map((node) => (
                     <Dot
                         key={node.id}
                         x={node.x}
                         y={node.y}
-                        radius={lineWidth * 2 + 1}
+                        size={tipSize}
                         color="white"
+                        outline={outline}
                     />
                 ))}
             {endMarker && (
@@ -74,13 +79,13 @@ function LineConnector({
                     size={fontSize}
                     lineWidth={lineWidth}
                     color="white"
-                    outline={1}
+                    outline={outline}
                 />
             )}
-            <Path directions={pathDirections} lineWidth={lineWidth} color={color} />
+            <Path directions={pathDirections} size={lineWidth} color={color} />
             {startMarker &&
                 endNodes.map((node) => (
-                    <Dot key={node.id} x={node.x} y={node.y} radius={lineWidth * 2} color={color} />
+                    <Dot key={node.id} x={node.x} y={node.y} size={tipSize} color={color} />
                 ))}
             {endMarker && (
                 <Triangle
