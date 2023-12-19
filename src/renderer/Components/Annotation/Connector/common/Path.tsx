@@ -30,10 +30,11 @@ export type PathDirection =
 
 interface PathProps {
     directions: PathDirection[];
-    lineWidth: number;
+    size: number;
     color: string;
+    outline?: number;
 }
-function Path({ directions, lineWidth, color }: PathProps): ReactElement {
+function Path({ directions, size, color, outline }: PathProps): ReactElement {
     return (
         <path
             d={directions
@@ -54,11 +55,14 @@ function Path({ directions, lineWidth, color }: PathProps): ReactElement {
                 .join(' ')}
             fill="none"
             stroke={color}
-            strokeWidth={lineWidth}
+            strokeWidth={size / 2 + (outline || 0)}
             strokeLinecap="round"
             strokeLinejoin="round"
         />
     );
 }
+Path.defaultProps = {
+    outline: undefined,
+};
 
 export default Path;
