@@ -12,7 +12,7 @@ function Connector(connector: ConnectorProps): ReactElement {
 
     switch (type) {
         case 'line': {
-            const { endNodes, connectionNode, startMarker } = connector;
+            const { endNodes, connectionNode, startMarker, tipType } = connector;
 
             return (
                 <LineConnector
@@ -23,6 +23,7 @@ function Connector(connector: ConnectorProps): ReactElement {
                     color={color}
                     labelOrientation={labelOrientation}
                     fontSize={fontSize}
+                    tipType={tipType}
                     startMarker={startMarker}
                     endMarker={endMarker}
                 />

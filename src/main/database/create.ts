@@ -1,4 +1,4 @@
-import { runDB } from './utils';
+import { hasColumn, runDB } from './utils';
 
 const createDB = async (): Promise<void> => {
     await runDB(`
@@ -26,6 +26,12 @@ const createDB = async (): Promise<void> => {
             permanent BOOLEAN NOT NULL
         )
     `);
+    if (!(await hasColumn('annotations', 'tip'))) {
+        await runDB(`
+            ALTER TABLE annotations
+            ADD COLUMN tip TEXT NOT NULL DEFAULT "circle";
+        `);
+    }
 
     await runDB(`
         CREATE TABLE IF NOT EXISTS nodes (
