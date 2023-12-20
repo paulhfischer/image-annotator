@@ -13,6 +13,8 @@ import {
     useId,
 } from '@fluentui/react-components';
 
+import { AnnotationType } from '@common/types';
+import { getEndNodes, getSpecialNode } from '@common/utils';
 import { DeleteFilled, DeleteRegular, bundleIcon } from '@fluentui/react-icons';
 import React, { ChangeEvent, useMemo } from 'react';
 import { useAppContext } from '../Context';
@@ -67,6 +69,7 @@ function AnnotationEdit() {
         [selectedNodeID, selectedAnnotation],
     );
 
+    const annotationTypeID = useId();
     const annotationUIDID = useId();
     const annotationLabelID = useId();
     const annotationLabelPositionID = useId();
@@ -77,6 +80,48 @@ function AnnotationEdit() {
     if (!selectedImage || !selectedAnnotation) {
         return <></>; // eslint-disable-line react/jsx-no-useless-fragment
     }
+
+    const handleUpdateType = (
+        event: ChangeEvent<HTMLSelectElement>,
+        data: SelectOnChangeData,
+    ): void => {
+        const endNodes = getEndNodes(selectedAnnotation);
+        const specialNode = getSpecialNode(selectedAnnotation);
+
+        let updatedAnnotation: Partial<AnnotationType> = {
+            id: selectedAnnotation.id,
+            uid: selectedAnnotation.uid,
+            label: selectedAnnotation.label,
+            labelPosition: selectedAnnotation.labelPosition,
+            permanent: selectedAnnotation.permanent,
+            tipType: selectedAnnotation.tipType,
+        };
+        switch (data.value) {
+            case 'line':
+                updatedAnnotation = {
+                    ...updatedAnnotation,
+                    type: 'line',
+                    endNodes,
+                    connectionNode: specialNode,
+                };
+                break;
+            case 'brace':
+                if (endNodes.length !== 2) throw new Error();
+
+                updatedAnnotation = {
+                    ...updatedAnnotation,
+                    type: 'brace',
+                    nodeA: endNodes[0],
+                    connectionNode: specialNode,
+                    nodeB: endNodes[1],
+                };
+                break;
+            default:
+                throw new Error();
+        }
+
+        dispatch({ type: 'UPDATE_ANNOTATION', payload: updatedAnnotation as AnnotationType });
+    };
 
     const handleUpdateUID = (
         event: ChangeEvent<HTMLInputElement>,
@@ -188,6 +233,20 @@ function AnnotationEdit() {
                     value={selectedAnnotation.uid}
                     onChange={handleUpdateUID}
                 />
+            </div>
+            <div className={classes.row}>
+                <Label size="small" htmlFor={annotationTypeID}>
+                    type
+                </Label>
+                <Select
+                    size="small"
+                    id={annotationTypeID}
+                    value={selectedAnnotation.type}
+                    onChange={handleUpdateType}
+                >
+                    <option>line</option>
+                    {getEndNodes(selectedAnnotation).length === 2 && <option>brace</option>}
+                </Select>
             </div>
             <div className={classes.row}>
                 <Label size="small" htmlFor={annotationLabelID}>
