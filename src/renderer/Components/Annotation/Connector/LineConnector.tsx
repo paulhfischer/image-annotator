@@ -4,7 +4,14 @@ import Arrow from './common/Arrow';
 import Dot from './common/Dot';
 import Path, { PathDirection } from './common/Path';
 import Triangle from './common/Triangle';
-import { Orientation, Vector, invertOrientation } from './common/utils';
+import {
+    Orientation,
+    Vector,
+    angleDeg,
+    connectionVector,
+    normalizedVector,
+    orientationToAngle,
+} from './common/utils';
 
 export interface LineConnectorProps {
     endNodes: NodeType[];
@@ -55,39 +62,22 @@ function LineConnector({
         }
 
         endNodes.forEach((node, index) => {
+            const direction = normalizedVector(
+                connectionVector(connectionNode || labelPosition, node),
+            );
+
             switch (tipType) {
                 case 'circle':
                     directions.push({ command: 'line', target: node });
                     break;
                 case 'arrow':
-                    switch (labelOrientation) {
-                        case 'top':
-                            directions.push({
-                                command: 'line',
-                                target: { x: node.x, y: node.y - tipSize / 2 },
-                            });
-                            break;
-                        case 'right':
-                            directions.push({
-                                command: 'line',
-                                target: { x: node.x + tipSize / 2, y: node.y },
-                            });
-                            break;
-                        case 'bottom':
-                            directions.push({
-                                command: 'line',
-                                target: { x: node.x, y: node.y + tipSize / 2 },
-                            });
-                            break;
-                        case 'left':
-                            directions.push({
-                                command: 'line',
-                                target: { x: node.x - tipSize / 2, y: node.y },
-                            });
-                            break;
-                        default:
-                            throw new Error();
-                    }
+                    directions.push({
+                        command: 'line',
+                        target: {
+                            x: node.x - direction.x * (tipSize / 2),
+                            y: node.y - direction.y * (tipSize / 2),
+                        },
+                    });
                     break;
                 default:
                     throw new Error();
@@ -103,7 +93,7 @@ function LineConnector({
         });
 
         return directions;
-    }, [endNodes, connectionNode, labelPosition, labelOrientation, tipSize, tipType]);
+    }, [endNodes, connectionNode, labelPosition, tipSize, tipType]);
 
     return (
         <>
@@ -128,7 +118,7 @@ function LineConnector({
                                     key={node.id}
                                     x={node.x}
                                     y={node.y}
-                                    orientation={invertOrientation(labelOrientation)}
+                                    rotation={angleDeg(connectionNode || labelPosition, node)}
                                     size={tipSize}
                                     color="white"
                                     outline={outline}
@@ -142,7 +132,11 @@ function LineConnector({
                 <Triangle
                     x={labelPosition.x}
                     y={labelPosition.y}
-                    orientation={invertOrientation(labelOrientation)}
+                    rotation={
+                        connectionNode
+                            ? angleDeg(labelPosition, connectionNode)
+                            : orientationToAngle(labelOrientation)
+                    }
                     size={fontSize}
                     lineWidth={lineWidth}
                     color="white"
@@ -169,7 +163,7 @@ function LineConnector({
                                     key={node.id}
                                     x={node.x}
                                     y={node.y}
-                                    orientation={invertOrientation(labelOrientation)}
+                                    rotation={angleDeg(connectionNode || labelPosition, node)}
                                     size={tipSize}
                                     color={color}
                                 />
@@ -182,7 +176,11 @@ function LineConnector({
                 <Triangle
                     x={labelPosition.x}
                     y={labelPosition.y}
-                    orientation={invertOrientation(labelOrientation)}
+                    rotation={
+                        connectionNode
+                            ? angleDeg(labelPosition, connectionNode)
+                            : orientationToAngle(labelOrientation)
+                    }
                     size={fontSize}
                     lineWidth={lineWidth}
                     color={color}

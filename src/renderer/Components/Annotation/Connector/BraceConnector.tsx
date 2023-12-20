@@ -1,7 +1,7 @@
 import React, { ReactElement, useMemo } from 'react';
 import Path, { PathDirection } from './common/Path';
 import Triangle from './common/Triangle';
-import { Orientation, Vector, braceVectors, invertOrientation } from './common/utils';
+import { Orientation, Vector, angleDeg, braceVectors, orientationToAngle } from './common/utils';
 
 export interface BraceConnectorProps {
     pointA: Vector;
@@ -68,7 +68,11 @@ function BraceConnector({
                 <Triangle
                     x={labelPosition.x}
                     y={labelPosition.y}
-                    orientation={invertOrientation(labelOrientation)}
+                    rotation={
+                        connectionNode
+                            ? angleDeg(labelPosition, connectionNode)
+                            : orientationToAngle(labelOrientation)
+                    }
                     size={fontSize}
                     lineWidth={lineWidth}
                     color="white"
@@ -80,7 +84,11 @@ function BraceConnector({
                 <Triangle
                     x={labelPosition.x}
                     y={labelPosition.y}
-                    orientation={invertOrientation(labelOrientation)}
+                    rotation={
+                        connectionNode
+                            ? angleDeg(labelPosition, connectionNode)
+                            : orientationToAngle(labelOrientation)
+                    }
                     size={fontSize}
                     lineWidth={lineWidth}
                     color={color}
