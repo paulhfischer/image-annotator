@@ -7,8 +7,8 @@ export type Orientation = 'top' | 'right' | 'bottom' | 'left';
 
 export const connectionVector = (pointA: Vector, pointB: Vector): Vector => {
     return {
-        x: pointA.x - pointB.x,
-        y: pointA.y - pointB.y,
+        x: pointB.x - pointA.x,
+        y: pointB.y - pointA.y,
     };
 };
 
@@ -136,8 +136,8 @@ export const braceVectors = (
             throw new Error();
     }
 
-    const { x: dx, y: dy } = normalizedVector(connectionVector(start, end));
-    const length = vectorLength(connectionVector(start, end));
+    const { x: dx, y: dy } = normalizedVector(connectionVector(end, start));
+    const length = vectorLength(connectionVector(end, start));
     const stretch = 0.5;
     const size = 40;
     const dashSize = size * (1 / 6);
