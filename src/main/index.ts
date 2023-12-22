@@ -3,6 +3,7 @@ import unhandled from 'electron-unhandled';
 import { join } from 'path';
 
 import { ImageType, NewAnnotationType, NewImageType } from '@common/types';
+import sharp from 'sharp';
 import { createAnnotationInDB } from './database/annotations';
 import createDB from './database/create';
 import {
@@ -12,7 +13,7 @@ import {
     fetchImagesFromDB,
     updateImageInDB,
 } from './database/images';
-import { openImage } from './openImage';
+import { openImage, resizeImage } from './openImage';
 import saveFile from './saveFile';
 
 const createBrowserWindow = (): BrowserWindow => {
@@ -75,11 +76,54 @@ const registerIpcEventListeners = () => {
     );
 };
 
+const improveImages = async (): Promise<void> => {
+    const images = await fetchImagesFromDB();
+
+    images.forEach(async (image, index) => {
+        console.log(`processing ${image.uid} (${index + 1}/${images.length})`);
+        const cleanImg = await resizeImage(
+            sharp(Buffer.from(image.meta.cleanContent, 'base64')).jpeg({
+                quality: 100,
+                mozjpeg: true,
+            }),
+        );
+        const annotatedImage = image.meta.annotatedContent
+            ? await resizeImage(
+                  sharp(Buffer.from(image.meta.annotatedContent, 'base64')).jpeg({
+                      quality: 100,
+                      mozjpeg: true,
+                  }),
+              )
+            : undefined;
+
+        const oldLength = image.meta.cleanContent.length;
+        const newLength = (await cleanImg.toBuffer()).toString('base64').length;
+
+        await updateImageInDB({
+            ...image,
+            meta: {
+                ...image.meta,
+                cleanContent: (await cleanImg.toBuffer()).toString('base64'),
+                annotatedContent: annotatedImage
+                    ? (await annotatedImage.toBuffer()).toString('base64')
+                    : undefined,
+            },
+        });
+        console.log(
+            `=> updated ${image.uid} (${index + 1}/${images.length}) | difference: ${
+                ((oldLength - newLength) / oldLength) * 100
+            }%`,
+        );
+    });
+};
+
 const main = async (): Promise<void> => {
     unhandled();
 
     await app.whenReady();
     await createDB();
+
+    await improveImages();
 
     const mainWindow = createBrowserWindow();
     loadUI(mainWindow, app.isPackaged);

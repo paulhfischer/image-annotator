@@ -12,7 +12,7 @@ export interface ImageMeta {
     height: number;
 }
 
-const resizeImage = async (image: sharp.Sharp): Promise<sharp.Sharp> => {
+export const resizeImage = async (image: sharp.Sharp): Promise<sharp.Sharp> => {
     const { width, height } = await image.metadata();
 
     if (!width || !height) throw new Error();
@@ -24,6 +24,8 @@ const resizeImage = async (image: sharp.Sharp): Promise<sharp.Sharp> => {
             height: IMAGE_SIZE,
             fit: sharp.fit.inside,
         });
+
+        console.log('RESIZED!!!!!');
 
         dialog.showMessageBox({
             message: `Image has been downsized!`,
