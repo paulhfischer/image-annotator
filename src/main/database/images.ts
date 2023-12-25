@@ -11,7 +11,7 @@ type ImageDBType = {
     annotation_size: string;
     width: number;
     height: number;
-    group_name: string;
+    group_name: string | null;
 };
 
 const getUniqueImageID = async (): Promise<string> => {
@@ -51,7 +51,7 @@ const entryToType = async (entry: ImageDBType): Promise<ImageType> => {
         name: entry.name,
         annotationSize: entry.annotation_size,
         annotations: await fetchAnnotationsFromDB(entry.id),
-        group: entry.group_name,
+        group: entry.group_name || '',
     };
 };
 
