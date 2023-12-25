@@ -63,6 +63,19 @@ export const updateNode = (
                                                 ),
                                             }),
                                   };
+                              case 'brace':
+                                  return {
+                                      ...annotation,
+                                      ...(annotation.connectionNode?.id === payload.id
+                                          ? { connectionNode: payload }
+                                          : {}),
+                                      ...(annotation.nodeA.id === payload.id
+                                          ? { nodeA: payload }
+                                          : {}),
+                                      ...(annotation.nodeB.id === payload.id
+                                          ? { nodeB: payload }
+                                          : {}),
+                                  };
                               default:
                                   throw new Error();
                           }
@@ -106,6 +119,19 @@ export const removeNode = (
                                                 endNodes: annotation.endNodes.filter(
                                                     (node) => node.id !== payload.id,
                                                 ),
+                                            }),
+                                  };
+                              case 'brace':
+                                  return {
+                                      ...annotation,
+                                      ...(annotation.connectionNode?.id === payload.id
+                                          ? { connectionNode: undefined }
+                                          : {
+                                                type: 'line',
+                                                endNodes: [
+                                                    annotation.nodeA,
+                                                    annotation.nodeB,
+                                                ].filter((node) => node.id !== payload.id),
                                             }),
                                   };
                               default:
