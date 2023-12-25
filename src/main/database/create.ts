@@ -13,6 +13,12 @@ const createDB = async (): Promise<void> => {
             height INTEGER NOT NULL
         )
     `);
+    if (!(await hasColumn('images', 'group_name'))) {
+        await runDB(`
+            ALTER TABLE images
+            ADD COLUMN group_name TEXT NULL;
+        `);
+    }
 
     await runDB(`
         CREATE TABLE IF NOT EXISTS annotations (

@@ -75,6 +75,7 @@ function ImageEdit(): ReactElement {
 
     const imageNameID = useId();
     const imageUIDID = useId();
+    const imageGroupID = useId();
     const annotationSizeID = useId();
 
     if (!selectedImage) {
@@ -137,6 +138,18 @@ function ImageEdit(): ReactElement {
         dispatch({ type: 'UPDATE_IMAGE', payload: updatedImage });
     };
 
+    const handleUpdateGroup = (
+        event: ChangeEvent<HTMLInputElement>,
+        data: InputOnChangeData,
+    ): void => {
+        const updatedImage = {
+            ...selectedImage,
+            group: data.value,
+        };
+
+        dispatch({ type: 'UPDATE_IMAGE', payload: updatedImage });
+    };
+
     const handleUpdateAnnotationSize = async (
         event: ChangeEvent<HTMLInputElement>,
         data: SliderOnChangeData,
@@ -187,6 +200,17 @@ function ImageEdit(): ReactElement {
                     size="small"
                     value={selectedImage.uid}
                     onChange={handleUpdateUID}
+                />
+            </div>
+            <div className={classes.row}>
+                <Label size="small" htmlFor={imageGroupID}>
+                    group
+                </Label>
+                <Input
+                    id={imageGroupID}
+                    size="small"
+                    value={selectedImage.group}
+                    onChange={handleUpdateGroup}
                 />
             </div>
             <div className={classes.row}>
