@@ -16,6 +16,7 @@ export type ImageType = {
     name: string;
     annotationSize: 'small' | 'medium' | 'large';
     annotations: AnnotationType[];
+    group: string;
 };
 
 export type NewAnnotationType =

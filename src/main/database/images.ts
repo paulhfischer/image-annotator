@@ -11,6 +11,7 @@ type ImageDBType = {
     annotation_size: string;
     width: number;
     height: number;
+    group_name: string;
 };
 
 const getUniqueImageID = async (): Promise<string> => {
@@ -50,6 +51,7 @@ const entryToType = async (entry: ImageDBType): Promise<ImageType> => {
         name: entry.name,
         annotationSize: entry.annotation_size,
         annotations: await fetchAnnotationsFromDB(entry.id),
+        group: entry.group_name,
     };
 };
 
@@ -69,7 +71,7 @@ export const fetchImagesFromDB = async (): Promise<ImageType[]> => {
 
 export const createImageInDB = async (image: NewImageType): Promise<ImageType> => {
     const result = await runDB(
-        `INSERT INTO images (uid, name, clean_content, annotated_content, annotation_size, width, height) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO images (uid, name, clean_content, annotated_content, annotation_size, width, height, group_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         [
             await getUniqueImageID(),
             image.name,
@@ -78,6 +80,7 @@ export const createImageInDB = async (image: NewImageType): Promise<ImageType> =
             'medium',
             image.width,
             image.height,
+            null,
         ],
     );
 
@@ -97,7 +100,7 @@ export const updateImageInDB = async (image: ImageType): Promise<ImageType> => {
     await Promise.all(removedAnnotations.map((annotation) => deleteAnnotationInDB(annotation)));
 
     await runDB(
-        `UPDATE images SET uid = ?, name = ?, clean_content = ?, annotated_content = ?, annotation_size = ?, width = ?, height = ? WHERE id = ?`,
+        `UPDATE images SET uid = ?, name = ?, clean_content = ?, annotated_content = ?, annotation_size = ?, width = ?, height = ?, group_name = ? WHERE id = ?`,
         [
             image.uid,
             image.name,
@@ -106,6 +109,7 @@ export const updateImageInDB = async (image: ImageType): Promise<ImageType> => {
             image.annotationSize,
             image.meta.width,
             image.meta.height,
+            image.group,
             image.id,
         ],
     );
