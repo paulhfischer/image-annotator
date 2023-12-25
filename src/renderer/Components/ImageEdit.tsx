@@ -73,6 +73,7 @@ function ImageEdit(): ReactElement {
         [selectedImageID, images],
     );
 
+    const imageNameID = useId();
     const imageUIDID = useId();
     const annotationSizeID = useId();
 
@@ -167,7 +168,15 @@ function ImageEdit(): ReactElement {
                 </Button>
             </div>
             <div className={classes.row}>
-                <Input size="small" value={selectedImage.name} onChange={handleUpdateName} />
+                <Label size="small" htmlFor={imageNameID}>
+                    name
+                </Label>
+                <Input
+                    id={imageNameID}
+                    size="small"
+                    value={selectedImage.name}
+                    onChange={handleUpdateName}
+                />
             </div>
             <div className={classes.row}>
                 <Label size="small" htmlFor={imageUIDID}>
