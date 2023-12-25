@@ -93,7 +93,7 @@ function ImageList(): ReactElement {
         const value = data.value as string;
 
         const type = value.split('-')[0];
-        const id = value.split('-')[1];
+        const id = value.split('-').slice(1).join('-');
 
         switch (type) {
             case 'group':
