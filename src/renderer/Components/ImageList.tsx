@@ -57,7 +57,7 @@ function ImageList(): ReactElement {
         [selectedImageID, images],
     );
 
-    const groupedImages = useMemo(
+    const groupedImages: [string, ImageType[]][] = useMemo(
         () =>
             Object.entries(
                 images.reduce<Record<string, ImageType[]>>((acc, image) => {
@@ -66,12 +66,17 @@ function ImageList(): ReactElement {
                     acc[groupName].push(image);
                     return acc;
                 }, {}),
-            ).sort(([a], [b]) => {
-                if (a === 'ungrouped') return 1;
-                if (b === 'ungrouped') return -1;
+            )
+                .sort(([a], [b]) => {
+                    if (a === 'ungrouped') return 1;
+                    if (b === 'ungrouped') return -1;
 
-                return a.localeCompare(b);
-            }),
+                    return a.localeCompare(b);
+                })
+                .map(([groupName, groupImages]) => [
+                    groupName,
+                    groupImages.sort((a, b) => a.name.localeCompare(b.name)),
+                ]),
         [images],
     );
 
