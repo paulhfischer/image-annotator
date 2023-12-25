@@ -1,10 +1,11 @@
 import { getNodes, getSpecialNode } from '@common/utils';
 import {
-    SelectTabData,
-    SelectTabEvent,
-    Tab,
-    TabList,
+    FlatTree,
+    FlatTreeItem,
+    TreeItemLayout,
+    TreeOpenChangeData,
     makeStyles,
+    tokens,
 } from '@fluentui/react-components';
 import {
     ArrowFlowUpRightFilled,
@@ -13,7 +14,7 @@ import {
     ArrowFlowUpRightRegular,
     bundleIcon,
 } from '@fluentui/react-icons';
-import React, { ReactElement, useMemo } from 'react';
+import React, { MouseEvent, ReactElement, useMemo } from 'react';
 import { useAppContext } from '../Context';
 import { getAnnotationByID } from '../Context/reducer/annotation';
 import { getImageByID } from '../Context/reducer/image';
@@ -34,9 +35,14 @@ export const useStyles = makeStyles({
         flexBasis: '0%',
         overflowY: 'auto',
     },
-    tab: {
-        textAlign: 'start',
+    activeTab: {
+        color: tokens.colorNeutralForeground2Hover,
+        backgroundColor: tokens.colorSubtleBackgroundHover,
     },
+    activeIcon: {
+        color: tokens.colorNeutralForeground2Hover,
+    },
+    inactiveIcon: {},
 });
 
 function AnnotationList(): ReactElement {
@@ -82,9 +88,7 @@ function AnnotationList(): ReactElement {
         return getNodes(selectedAnnotation);
     }, [selectedAnnotation]);
 
-    const onSelectAnnotation = (event: SelectTabEvent<HTMLElement>, data: SelectTabData) => {
-        const annotationID = data.value as number;
-
+    const onSelectAnnotation = (annotationID: number) => {
         if (selectedAnnotation && annotationID === selectedAnnotation.id) {
             dispatch({ type: 'SET_ANNOTATION', payload: undefined });
         } else {
@@ -97,10 +101,8 @@ function AnnotationList(): ReactElement {
         }
     };
 
-    const onSelectNode = (event: SelectTabEvent<HTMLElement>, data: SelectTabData) => {
+    const onSelectNode = (nodeID: number) => {
         if (!selectedAnnotation) throw new Error();
-
-        const nodeID = data.value as number;
 
         if (selectedNode && nodeID === selectedNode.id) {
             dispatch({ type: 'SET_NODE', payload: undefined });
@@ -114,58 +116,108 @@ function AnnotationList(): ReactElement {
         }
     };
 
+    const onSelect = (
+        event: MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>,
+        data: TreeOpenChangeData,
+    ) => {
+        const value = data.value as string;
+
+        const type = value.split('-')[0];
+        const id = parseInt(value.split('-')[1], 10);
+
+        switch (type) {
+            case 'annotation':
+                onSelectAnnotation(id);
+                break;
+            case 'node':
+                onSelectNode(id);
+                break;
+            default:
+                throw new Error();
+        }
+    };
+
     if (!selectedImage) {
         return <></>; // eslint-disable-line react/jsx-no-useless-fragment
     }
 
     return (
-        <TabList
+        <FlatTree
             className={classes.list}
-            size="medium"
-            vertical
-            selectedValue={selectedAnnotation ? selectedAnnotation.id : null}
-            onTabSelect={onSelectAnnotation}
+            size="small"
+            openItems={selectedAnnotationID ? [`annotation-${selectedAnnotationID}`] : undefined}
+            onOpenChange={onSelect}
+            aria-label="annotation-list"
         >
-            {annotations.map((annotation) => (
+            {annotations.map((annotation, annotationIndex) => (
                 <>
-                    <Tab key={annotation.id} value={annotation.id} className={classes.tab}>
-                        {annotation.label
-                            ? annotation.label.split('\n').map((line, index) => (
-                                  <>
-                                      {index > 0 && <br />}
-                                      {line}
-                                  </>
-                              ))
-                            : `unnamed-${annotation.id}`}
-                    </Tab>
+                    <FlatTreeItem
+                        key={annotation.id}
+                        value={`annotation-${annotation.id}`}
+                        itemType="branch"
+                        aria-level={1}
+                        aria-setsize={annotations.length}
+                        aria-posinset={annotationIndex + 1}
+                        className={
+                            annotation.id === selectedAnnotationID ? classes.activeTab : undefined
+                        }
+                    >
+                        <TreeItemLayout>
+                            {annotation.label
+                                ? annotation.label.split('\n').map((line, index) => (
+                                      <>
+                                          {index > 0 && <br />}
+                                          {line}
+                                      </>
+                                  ))
+                                : `unnamed-${annotation.id}`}
+                        </TreeItemLayout>
+                    </FlatTreeItem>
                     {selectedAnnotation && selectedAnnotation.id === annotation.id && (
-                        <TabList
-                            size="small"
-                            vertical
-                            selectedValue={selectedNode ? selectedNode.id : null}
-                            onTabSelect={onSelectNode}
-                        >
-                            {nodes.map((node) => (
-                                <Tab
+                        <>
+                            {nodes.map((node, NodeIndex) => (
+                                <FlatTreeItem
                                     key={node.id}
-                                    value={node.id}
-                                    icon={
-                                        getSpecialNode(selectedAnnotation)?.id === node.id ? (
-                                            <SpecialNodeIcon />
-                                        ) : (
-                                            <NodeIcon />
-                                        )
+                                    parentValue={`annotation-${annotation.id}`}
+                                    value={`node-${node.id}`}
+                                    itemType="branch"
+                                    aria-level={2}
+                                    aria-setsize={nodes.length}
+                                    aria-posinset={NodeIndex + 1}
+                                    className={
+                                        node.id === selectedNodeID ? classes.activeTab : undefined
                                     }
-                                    className={classes.tab}
                                 >
-                                    ({node.x} | {node.y})
-                                </Tab>
+                                    <TreeItemLayout
+                                        expandIcon={
+                                            getSpecialNode(selectedAnnotation)?.id === node.id ? (
+                                                <SpecialNodeIcon
+                                                    className={
+                                                        node.id === selectedNodeID
+                                                            ? classes.activeIcon
+                                                            : classes.inactiveIcon
+                                                    }
+                                                />
+                                            ) : (
+                                                <NodeIcon
+                                                    className={
+                                                        node.id === selectedNodeID
+                                                            ? classes.activeIcon
+                                                            : classes.inactiveIcon
+                                                    }
+                                                />
+                                            )
+                                        }
+                                    >
+                                        ({node.x} | {node.y})
+                                    </TreeItemLayout>
+                                </FlatTreeItem>
                             ))}
-                        </TabList>
+                        </>
                     )}
                 </>
             ))}
-        </TabList>
+        </FlatTree>
     );
 }
 
