@@ -10,6 +10,7 @@ import {
     Textarea,
     TextareaOnChangeData,
     makeStyles,
+    tokens,
     useId,
 } from '@fluentui/react-components';
 
@@ -39,6 +40,29 @@ const useStyles = makeStyles({
         width: 'calc(100% - 10px)',
         display: 'flex',
         flexDirection: 'column',
+    },
+    checkboxSmall: {
+        '& label': {
+            fontSize: tokens.fontSizeBase200,
+            lineHeight: tokens.lineHeightBase200,
+            paddingTop: 0,
+            paddingRight: tokens.spacingHorizontalXXS,
+            paddingBottom: 0,
+            paddingLeft: 0,
+        },
+        '& input': {
+            width: `calc(${tokens.fontSizeBase200} + 2*${tokens.spacingHorizontalXXS})`,
+            height: `calc(${tokens.fontSizeBase200} + 2*${tokens.spacingHorizontalXXS})`,
+        },
+        '& div': {
+            marginTop: tokens.spacingHorizontalXXS,
+            marginRight: tokens.spacingHorizontalXXS,
+            marginBottom: tokens.spacingHorizontalXXS,
+            marginLeft: tokens.spacingHorizontalXXS,
+            width: tokens.fontSizeBase200,
+            height: tokens.fontSizeBase200,
+            fontSize: tokens.fontSizeBase200,
+        },
     },
 });
 
@@ -276,9 +300,11 @@ function AnnotationEdit() {
                     <option>left</option>
                 </Select>
             </div>
-            <div className={classes.row}>
+            <div className={classes.row} style={{ display: 'initial' }}>
                 <Checkbox
+                    className={classes.checkboxSmall}
                     label="permanent"
+                    labelPosition="before"
                     checked={selectedAnnotation.permanent}
                     onChange={handleUpdatePermanent}
                 />
