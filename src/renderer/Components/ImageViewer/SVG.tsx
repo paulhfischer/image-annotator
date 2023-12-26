@@ -30,6 +30,7 @@ export const useStyles = makeStyles({
 type SVGProps =
     | {
           render?: false;
+          markers?: boolean;
           nodes: NewNodeType[];
           specialNode: NewNodeType | undefined;
           handleClick: (event: MouseEvent<SVGSVGElement>) => void;
@@ -37,6 +38,7 @@ type SVGProps =
       }
     | {
           render: true;
+          markers?: boolean;
           nodes?: undefined;
           specialNode?: undefined;
           handleClick?: undefined;
@@ -44,7 +46,7 @@ type SVGProps =
       };
 
 const SVG = React.forwardRef<SVGSVGElement, SVGProps>(
-    ({ render, nodes, specialNode, handleClick, zoom }, ref): ReactElement => {
+    ({ render, markers, nodes, specialNode, handleClick, zoom }, ref): ReactElement => {
         const classes = useStyles();
 
         const {
@@ -121,7 +123,7 @@ const SVG = React.forwardRef<SVGSVGElement, SVGProps>(
                                 ? maxLabelWidth.tb
                                 : maxLabelWidth.lr
                         }
-                        render={!!render}
+                        markers={!!markers}
                     />
                 ))}
                 {nodes &&
@@ -149,5 +151,9 @@ const SVG = React.forwardRef<SVGSVGElement, SVGProps>(
         );
     },
 );
+
+SVG.defaultProps = {
+    markers: false,
+};
 
 export default SVG;

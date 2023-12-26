@@ -1,5 +1,13 @@
 // eslint-disable
-import { Toolbar, ToolbarButton, ToolbarDivider, Tooltip } from '@fluentui/react-components';
+import {
+    Popover,
+    PopoverSurface,
+    PopoverTrigger,
+    Toolbar,
+    ToolbarButton,
+    ToolbarDivider,
+    Tooltip,
+} from '@fluentui/react-components';
 import {
     DeleteFilled,
     DeleteRegular,
@@ -9,6 +17,10 @@ import {
     EyeRegular,
     ImageAddFilled,
     ImageAddRegular,
+    ImageFilled,
+    ImageOffFilled,
+    ImageOffRegular,
+    ImageRegular,
     SaveEditFilled,
     SaveEditRegular,
     SaveFilled,
@@ -27,6 +39,8 @@ import SVG from './ImageViewer/SVG';
 const AddImageIcon = bundleIcon(ImageAddFilled, ImageAddRegular);
 const ExportIcon = bundleIcon(SaveFilled, SaveRegular);
 const ExportAllIcon = bundleIcon(SaveMultipleFilled, SaveMultipleRegular);
+const ImageWithMarkersIcon = bundleIcon(ImageFilled, ImageRegular);
+const ImageWithoutMarkersIcon = bundleIcon(ImageOffFilled, ImageOffRegular);
 const SaveChangesIcon = bundleIcon(SaveEditFilled, SaveEditRegular);
 const DiscardChangesIcon = bundleIcon(DeleteFilled, DeleteRegular);
 const ShowAnnotatedImageIcon = bundleIcon(EyeFilled, EyeRegular);
@@ -56,13 +70,13 @@ function Menu(): ReactElement {
         dispatch({ type: 'SET_IMAGE', payload: newImage });
     };
 
-    const handleExport = async (): Promise<void> => {
+    const handleExport = async (markers: boolean): Promise<void> => {
         if (!selectedImage) throw new Error();
 
         await window.ContextBridge.saveFile({
             content: renderToString(
                 <ContextProvider state={state} dispatch={dispatch}>
-                    <SVG render />
+                    <SVG render markers={markers} />
                 </ContextProvider>,
             ),
             filename: `${selectedImage.name}.svg`,
@@ -78,7 +92,7 @@ function Menu(): ReactElement {
                             state={{ ...state, selectedImageID: image.id }}
                             dispatch={dispatch}
                         >
-                            <SVG render />
+                            <SVG render markers />
                         </ContextProvider>,
                     ),
                     filename: `${image.uid}.svg`,
@@ -126,9 +140,29 @@ function Menu(): ReactElement {
             </Tooltip>
             <ToolbarDivider />
             {selectedImage && (
-                <Tooltip content="export current image" relationship="label" withArrow>
-                    <ToolbarButton icon={<ExportIcon />} onClick={handleExport} />
-                </Tooltip>
+                <Popover withArrow trapFocus size="small">
+                    <PopoverTrigger disableButtonEnhancement>
+                        <Tooltip content="export current image" relationship="label" withArrow>
+                            <ToolbarButton icon={<ExportIcon />} />
+                        </Tooltip>
+                    </PopoverTrigger>
+                    <PopoverSurface>
+                        <Toolbar size="small">
+                            <Tooltip content="with markers" relationship="label" withArrow>
+                                <ToolbarButton
+                                    icon={<ImageWithMarkersIcon />}
+                                    onClick={() => handleExport(true)}
+                                />
+                            </Tooltip>
+                            <Tooltip content="without markers" relationship="label" withArrow>
+                                <ToolbarButton
+                                    icon={<ImageWithoutMarkersIcon />}
+                                    onClick={() => handleExport(false)}
+                                />
+                            </Tooltip>
+                        </Toolbar>
+                    </PopoverSurface>
+                </Popover>
             )}
             <Tooltip content="export all images" relationship="label" withArrow>
                 <ToolbarButton icon={<ExportAllIcon />} onClick={handleExportAll} />
