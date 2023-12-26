@@ -3,7 +3,7 @@ import { addAnnotation, removeAnnotation, setAnnotation, updateAnnotation } from
 import { addImage, removeImage, setImage, updateImage } from './image';
 import { addNode, removeNode, setNode, updateNode } from './node';
 import setChanges from './setChanges';
-import setShowOldAnnotations from './setShowOldAnnotations';
+import setShowAnnotatedImage from './setShowAnnotatedImage';
 import setState from './setState';
 
 const reducer = (state: AppContextStateType, action: AppContextActionType): AppContextStateType => {
@@ -47,8 +47,8 @@ const reducer = (state: AppContextStateType, action: AppContextActionType): AppC
         case 'SET_CHANGES': {
             return setChanges(state, action);
         }
-        case 'SET_SHOW_OLD_ANNOTATIONS': {
-            return setShowOldAnnotations(state, action);
+        case 'SET_SHOW_ANNOTATED_IMAGE': {
+            return setShowAnnotatedImage(state, action);
         }
         case 'SET_STATE': {
             return setState(state, action);
