@@ -45,7 +45,7 @@ interface AnnotationProps {
     imageWidth: number;
     imageHeight: number;
     maxLabelWidth: number;
-    render: boolean;
+    markers: boolean;
 }
 
 function Annotation({
@@ -57,7 +57,7 @@ function Annotation({
     imageWidth,
     imageHeight,
     maxLabelWidth,
-    render,
+    markers,
 }: AnnotationProps): ReactElement {
     const labelPosition = useMemo(
         () => getLabelVector(annotation, imageWidth, imageHeight),
@@ -68,8 +68,8 @@ function Annotation({
         case 'line':
             return (
                 <g id={id.toString()} className={annotation.permanent ? 'permanent' : undefined}>
-                    {!annotation.permanent && (
-                        <g className="marker" style={render ? undefined : { display: 'none' }}>
+                    {!annotation.permanent && markers && (
+                        <g className="marker">
                             <Connector
                                 type="line"
                                 endNodes={annotation.endNodes}
@@ -112,8 +112,8 @@ function Annotation({
         case 'brace':
             return (
                 <g id={id.toString()}>
-                    {!annotation.permanent && (
-                        <g className="marker" style={render ? undefined : { display: 'none' }}>
+                    {!annotation.permanent && markers && (
+                        <g className="marker">
                             <Connector
                                 type="brace"
                                 pointA={annotation.nodeA}
