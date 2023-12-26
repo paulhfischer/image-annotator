@@ -39,7 +39,7 @@ export function AppContextProvider({ children }: AppContextProviderProps): React
         selectedAnnotationID: undefined,
         selectedNodeID: undefined,
         changes: {},
-        showOldAnnotations: false,
+        showAnnotatedImage: false,
     });
 
     useEffect(() => {
@@ -54,7 +54,7 @@ export function AppContextProvider({ children }: AppContextProviderProps): React
                     selectedAnnotationID: undefined,
                     selectedNodeID: undefined,
                     changes: {},
-                    showOldAnnotations: false,
+                    showAnnotatedImage: false,
                 },
             });
 

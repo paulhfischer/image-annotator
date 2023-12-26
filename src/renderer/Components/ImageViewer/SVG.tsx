@@ -48,7 +48,7 @@ const SVG = React.forwardRef<SVGSVGElement, SVGProps>(
         const classes = useStyles();
 
         const {
-            state: { images, selectedImageID, selectedAnnotationID, showOldAnnotations },
+            state: { images, selectedImageID, selectedAnnotationID, showAnnotatedImage },
         } = useAppContext();
 
         const selectedImage = useMemo(
@@ -103,7 +103,7 @@ const SVG = React.forwardRef<SVGSVGElement, SVGProps>(
                     y={0}
                     width={selectedImage.meta.width}
                     height={selectedImage.meta.height}
-                    href={getImageURL(selectedImage, showOldAnnotations, render)}
+                    href={getImageURL(selectedImage, showAnnotatedImage, render)}
                 />
                 {annotations.map((annotation, index) => (
                     <Annotation

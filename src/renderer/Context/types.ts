@@ -7,7 +7,7 @@ export type AppContextStateType = {
     selectedAnnotationID: number | undefined;
     selectedNodeID: number | undefined;
     changes: Record<number, 'updated' | 'deleted'>;
-    showOldAnnotations: boolean;
+    showAnnotatedImage: boolean;
 };
 
 export type AppContextActionSetImageType = {
@@ -62,8 +62,8 @@ export type AppContextActionSetChangesType = {
     type: 'SET_CHANGES';
     payload: { imageID: number; changes: 'updated' | 'deleted' | undefined };
 };
-export type AppContextActionSetShowOldAnnotationsType = {
-    type: 'SET_SHOW_OLD_ANNOTATIONS';
+export type AppContextActionSetShowAnnotatedImageType = {
+    type: 'SET_SHOW_ANNOTATED_IMAGE';
     payload: boolean;
 };
 export type AppContextActionSetStateType = {
@@ -84,7 +84,7 @@ export type AppContextActionType =
     | AppContextActionUpdateNodeType
     | AppContextActionRemoveNodeType
     | AppContextActionSetChangesType
-    | AppContextActionSetShowOldAnnotationsType
+    | AppContextActionSetShowAnnotatedImageType
     | AppContextActionSetStateType;
 
 export type AppContextType = {

@@ -31,8 +31,8 @@ export const getViewBox = (image: ImageType) => {
     ].join(' ');
 };
 
-export const getImageURL = (image: ImageType, showOldAnnotations: boolean, render?: boolean) => {
-    if (render || !showOldAnnotations) {
+export const getImageURL = (image: ImageType, showAnnotatedImage: boolean, render?: boolean) => {
+    if (render || !showAnnotatedImage) {
         return `data:image/jpg;base64,${image.meta.cleanContent}`;
     }
 

@@ -6,7 +6,7 @@
         "email": "paul.fischer@mailbox.org",
         "url": "https://github.com/paulhfischer"
     },
-    "version": "1.8.4",
+    "version": "1.8.5",
     "scripts": {
         "build": "vite build",
         "dev": "vite",

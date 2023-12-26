@@ -1,5 +1,5 @@
 // eslint-disable
-import { Toolbar, ToolbarButton, ToolbarDivider } from '@fluentui/react-components';
+import { Toolbar, ToolbarButton, ToolbarDivider, Tooltip } from '@fluentui/react-components';
 import {
     DeleteFilled,
     DeleteRegular,
@@ -9,7 +9,11 @@ import {
     EyeRegular,
     ImageAddFilled,
     ImageAddRegular,
+    SaveEditFilled,
+    SaveEditRegular,
     SaveFilled,
+    SaveMultipleFilled,
+    SaveMultipleRegular,
     SaveRegular,
     bundleIcon,
 } from '@fluentui/react-icons';
@@ -21,11 +25,12 @@ import createAnkiCSV from '../anki';
 import SVG from './ImageViewer/SVG';
 
 const AddImageIcon = bundleIcon(ImageAddFilled, ImageAddRegular);
-const ExportSVGIcon = bundleIcon(SaveFilled, SaveRegular);
-const SaveChangesIcon = bundleIcon(SaveFilled, SaveRegular);
+const ExportIcon = bundleIcon(SaveFilled, SaveRegular);
+const ExportAllIcon = bundleIcon(SaveMultipleFilled, SaveMultipleRegular);
+const SaveChangesIcon = bundleIcon(SaveEditFilled, SaveEditRegular);
 const DiscardChangesIcon = bundleIcon(DeleteFilled, DeleteRegular);
-const ShowOldAnnotationsIcon = bundleIcon(EyeFilled, EyeRegular);
-const HideOldAnnotationsIcon = bundleIcon(EyeOffFilled, EyeOffRegular);
+const ShowAnnotatedImageIcon = bundleIcon(EyeFilled, EyeRegular);
+const HideAnnotatedImageIcon = bundleIcon(EyeOffFilled, EyeOffRegular);
 
 function Menu(): ReactElement {
     const { state, dispatch } = useAppContext();
@@ -51,7 +56,7 @@ function Menu(): ReactElement {
         dispatch({ type: 'SET_IMAGE', payload: newImage });
     };
 
-    const handleExportSVG = async (): Promise<void> => {
+    const handleExport = async (): Promise<void> => {
         if (!selectedImage) throw new Error();
 
         await window.ContextBridge.saveFile({
@@ -110,44 +115,55 @@ function Menu(): ReactElement {
         });
     };
 
-    const handleToggleShowOldAnnotations = () => {
-        dispatch({ type: 'SET_SHOW_OLD_ANNOTATIONS', payload: !state.showOldAnnotations });
+    const handleToggleAnnotatedImage = () => {
+        dispatch({ type: 'SET_SHOW_ANNOTATED_IMAGE', payload: !state.showAnnotatedImage });
     };
 
     return (
         <Toolbar>
-            <ToolbarButton icon={<AddImageIcon />} onClick={handleAddImage}>
-                add image
-            </ToolbarButton>
+            <Tooltip content="add image" relationship="label" withArrow>
+                <ToolbarButton icon={<AddImageIcon />} onClick={handleAddImage} />
+            </Tooltip>
+            <ToolbarDivider />
             {selectedImage && (
-                <ToolbarButton icon={<ExportSVGIcon />} onClick={handleExportSVG}>
-                    export
-                </ToolbarButton>
+                <Tooltip content="export current image" relationship="label" withArrow>
+                    <ToolbarButton icon={<ExportIcon />} onClick={handleExport} />
+                </Tooltip>
             )}
-            <ToolbarButton icon={<ExportSVGIcon />} onClick={handleExportAll}>
-                export all
-            </ToolbarButton>
+            <Tooltip content="export all images" relationship="label" withArrow>
+                <ToolbarButton icon={<ExportAllIcon />} onClick={handleExportAll} />
+            </Tooltip>
             {selectedImage && state.changes[selectedImage.id] && (
                 <>
-                    <ToolbarButton icon={<SaveChangesIcon />} onClick={handleSaveChanges}>
-                        save
-                    </ToolbarButton>
-                    <ToolbarButton icon={<DiscardChangesIcon />} onClick={handleDiscardChanges}>
-                        discard
-                    </ToolbarButton>
+                    <ToolbarDivider />
+                    <Tooltip content="save changes" relationship="label" withArrow>
+                        <ToolbarButton icon={<SaveChangesIcon />} onClick={handleSaveChanges} />
+                    </Tooltip>
+                    <Tooltip content="discard changes" relationship="label" withArrow>
+                        <ToolbarButton
+                            icon={<DiscardChangesIcon />}
+                            onClick={handleDiscardChanges}
+                        />
+                    </Tooltip>
                 </>
             )}
-            <ToolbarDivider />
-            <ToolbarButton
-                icon={
-                    state.showOldAnnotations ? (
-                        <ShowOldAnnotationsIcon />
-                    ) : (
-                        <HideOldAnnotationsIcon />
-                    )
-                }
-                onClick={handleToggleShowOldAnnotations}
-            />
+            {selectedImage && (
+                <>
+                    <ToolbarDivider />
+                    <Tooltip content="toggle annotated image" relationship="label" withArrow>
+                        <ToolbarButton
+                            icon={
+                                state.showAnnotatedImage ? (
+                                    <HideAnnotatedImageIcon />
+                                ) : (
+                                    <ShowAnnotatedImageIcon />
+                                )
+                            }
+                            onClick={handleToggleAnnotatedImage}
+                        />
+                    </Tooltip>
+                </>
+            )}
         </Toolbar>
     );
 }
