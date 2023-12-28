@@ -131,7 +131,23 @@ function ImageList(): ReactElement {
                         aria-posinset={groupIndex + 1}
                         className={groupName === selectedGroupName ? classes.activeTab : undefined}
                     >
-                        <TreeItemLayout>{groupName}</TreeItemLayout>
+                        <TreeItemLayout
+                            iconBefore={
+                                groupImages.some((image) => changes[image.id]) ? (
+                                    <UnsavedIcon className={classes.unsavedIcon} />
+                                ) : (
+                                    <SavedIcon
+                                        className={
+                                            groupName === selectedGroupName
+                                                ? classes.activeIcon
+                                                : classes.inactiveIcon
+                                        }
+                                    />
+                                )
+                            }
+                        >
+                            {groupName}
+                        </TreeItemLayout>
                     </FlatTreeItem>
                     {selectedGroupName && selectedGroupName === groupName && (
                         <>
