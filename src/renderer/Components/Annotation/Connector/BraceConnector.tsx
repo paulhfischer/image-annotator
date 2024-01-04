@@ -74,7 +74,7 @@ function BraceConnector({
                             : orientationToAngle(labelOrientation)
                     }
                     size={fontSize}
-                    lineWidth={lineWidth}
+                    tipSize={lineWidth}
                     color="white"
                     outline={outline}
                 />
@@ -90,7 +90,7 @@ function BraceConnector({
                             : orientationToAngle(labelOrientation)
                     }
                     size={fontSize}
-                    lineWidth={lineWidth}
+                    tipSize={lineWidth}
                     color={color}
                 />
             )}

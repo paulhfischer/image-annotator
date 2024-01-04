@@ -138,7 +138,7 @@ function LineConnector({
                             : orientationToAngle(labelOrientation)
                     }
                     size={fontSize}
-                    lineWidth={lineWidth}
+                    tipSize={lineWidth}
                     color="white"
                     outline={outline}
                 />
@@ -182,7 +182,7 @@ function LineConnector({
                             : orientationToAngle(labelOrientation)
                     }
                     size={fontSize}
-                    lineWidth={lineWidth}
+                    tipSize={lineWidth}
                     color={color}
                 />
             )}
