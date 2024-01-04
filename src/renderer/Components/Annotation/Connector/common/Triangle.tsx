@@ -6,31 +6,27 @@ interface TriangleProps {
     y: number;
     rotation: number;
     size: number;
-    lineWidth: number;
+    tipSize?: number;
     color: string;
     outline?: number;
 }
-function Triangle({
-    x,
-    y,
-    rotation,
-    size,
-    lineWidth,
-    color,
-    outline,
-}: TriangleProps): ReactElement {
+function Triangle({ x, y, rotation, size, tipSize, color, outline }: TriangleProps): ReactElement {
     const points = useMemo(() => {
         return [
             // base
             { x: x - size / 2, y: y + size },
             { x: x + size / 2, y: y + size },
             // tip
-            { x: x + lineWidth / 2, y },
-            { x: x - lineWidth / 2, y },
+            ...(tipSize && tipSize > 0
+                ? [
+                      { x: x + tipSize / 4, y },
+                      { x: x - tipSize / 4, y },
+                  ]
+                : [{ x, y }]),
         ]
             .map((pt) => rotateVector(pt, { x, y }, rotation))
             .map((pt) => `${pt.x},${pt.y}`);
-    }, [x, y, size, lineWidth, rotation]);
+    }, [x, y, size, tipSize, rotation]);
 
     return (
         <polygon
@@ -43,6 +39,7 @@ function Triangle({
 }
 Triangle.defaultProps = {
     outline: undefined,
+    tipSize: 0,
 };
 
 export default Triangle;
