@@ -14,7 +14,7 @@ import {
     ArrowFlowUpRightRegular,
     bundleIcon,
 } from '@fluentui/react-icons';
-import React, { MouseEvent, ReactElement, useMemo } from 'react';
+import React, { MouseEvent, ReactElement, useCallback, useEffect, useMemo } from 'react';
 import { useAppContext } from '../Context';
 import { getAnnotationByID } from '../Context/reducer/annotation';
 import { getImageByID } from '../Context/reducer/image';
@@ -88,18 +88,21 @@ function AnnotationList(): ReactElement {
         return getNodes(selectedAnnotation);
     }, [selectedAnnotation]);
 
-    const onSelectAnnotation = (annotationID: number) => {
-        if (selectedAnnotation && annotationID === selectedAnnotation.id) {
-            dispatch({ type: 'SET_ANNOTATION', payload: undefined });
-        } else {
-            const newSelectedAnnotation = selectedImage?.annotations.find(
-                (annotation) => annotation.id === annotationID,
-            );
-            if (!newSelectedAnnotation) throw new Error();
+    const onSelectAnnotation = useCallback(
+        (annotationID: number) => {
+            if (selectedAnnotation && annotationID === selectedAnnotation.id) {
+                dispatch({ type: 'SET_ANNOTATION', payload: undefined });
+            } else {
+                const newSelectedAnnotation = selectedImage?.annotations.find(
+                    (annotation) => annotation.id === annotationID,
+                );
+                if (!newSelectedAnnotation) throw new Error();
 
-            dispatch({ type: 'SET_ANNOTATION', payload: newSelectedAnnotation });
-        }
-    };
+                dispatch({ type: 'SET_ANNOTATION', payload: newSelectedAnnotation });
+            }
+        },
+        [dispatch, selectedAnnotation, selectedImage?.annotations],
+    );
 
     const onSelectNode = (nodeID: number) => {
         if (!selectedAnnotation) throw new Error();
@@ -136,6 +139,40 @@ function AnnotationList(): ReactElement {
                 throw new Error();
         }
     };
+
+    useEffect(() => {
+        const handleKeyDown = async (event: KeyboardEvent) => {
+            if (
+                document.activeElement &&
+                ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)
+            ) {
+                return;
+            }
+
+            switch (event.key) {
+                case 'Tab': {
+                    if (selectedImage) {
+                        event.preventDefault();
+                        const currentIndex =
+                            annotations.findIndex(
+                                (annotation) => annotation.id === selectedAnnotationID,
+                            ) || 0;
+                        onSelectAnnotation(annotations[(currentIndex + 1) % annotations.length].id);
+                    }
+                    break;
+                }
+                default: {
+                    break;
+                }
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [annotations, selectedAnnotationID, selectedImage, onSelectAnnotation]);
 
     if (!selectedImage) {
         return <></>; // eslint-disable-line react/jsx-no-useless-fragment
