@@ -99,6 +99,7 @@ function AnnotationList(): ReactElement {
                 if (!newSelectedAnnotation) throw new Error();
 
                 dispatch({ type: 'SET_ANNOTATION', payload: newSelectedAnnotation });
+                dispatch({ type: 'SET_NODE', payload: getNodes(newSelectedAnnotation)[0] });
             }
         },
         [dispatch, selectedAnnotation, selectedImage?.annotations],
