@@ -44,6 +44,7 @@ export type AnnotationType =
           connectionNode?: NodeType;
           permanent: boolean;
           tipType: 'circle' | 'arrow';
+          tipAngle: number;
       }
     | {
           id: number;

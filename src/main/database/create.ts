@@ -38,6 +38,12 @@ const createDB = async (): Promise<void> => {
             ADD COLUMN tip TEXT NOT NULL DEFAULT "circle";
         `);
     }
+    if (!(await hasColumn('annotations', 'tip_angle'))) {
+        await runDB(`
+            ALTER TABLE annotations
+            ADD COLUMN tip_angle INTEGER NOT NULL DEFAULT 0;
+        `);
+    }
 
     await runDB(`
         CREATE TABLE IF NOT EXISTS nodes (

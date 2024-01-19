@@ -19,6 +19,7 @@ type AnnotationDBType = {
     special_node: number | null;
     permanent: number;
     tip: string;
+    tip_angle: number;
 };
 
 const getUniqueAnnotationID = async (): Promise<string> => {
@@ -65,6 +66,7 @@ const entryToType = async (entry: AnnotationDBType): Promise<AnnotationType> => 
                 connectionNode: specialNode,
                 permanent: !!entry.permanent,
                 tipType: entry.tip,
+                tipAngle: entry.tip_angle,
             };
         }
         case 'brace': {
@@ -114,7 +116,7 @@ export const createAnnotationInDB = async (
     imageID: number,
 ): Promise<AnnotationType> => {
     const result = await runDB(
-        `INSERT INTO annotations (uid, type, label, label_position, image, permanent, tip) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO annotations (uid, type, label, label_position, image, permanent, tip, tip_angle) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         [
             await getUniqueAnnotationID(),
             annotation.type,
@@ -123,6 +125,7 @@ export const createAnnotationInDB = async (
             imageID,
             false,
             'circle',
+            0,
         ],
     );
 
@@ -154,7 +157,7 @@ export const updateAnnotationInDB = async (annotation: AnnotationType): Promise<
     await Promise.all(removedNodes.map((node) => deleteNodeInDB(node)));
 
     await runDB(
-        `UPDATE annotations SET uid = ?, type = ?, label = ?, label_position = ?, special_node = ?, permanent = ?, tip = ? WHERE id = ?`,
+        `UPDATE annotations SET uid = ?, type = ?, label = ?, label_position = ?, special_node = ?, permanent = ?, tip = ?, tip_angle = ? WHERE id = ?`,
         [
             annotation.uid,
             annotation.type,
@@ -163,6 +166,7 @@ export const updateAnnotationInDB = async (annotation: AnnotationType): Promise<
             getSpecialNode(annotation) ? getSpecialNode(annotation).id : null,
             annotation.permanent,
             annotation.tipType,
+            annotation.type === 'line' ? annotation.tipAngle : 0,
             annotation.id,
         ],
     );
