@@ -104,13 +104,15 @@ export const braceVectors = (
     start: Vector;
     tip: Vector;
     end: Vector;
-    s: Vector;
+    c: Vector;
     q1: Vector;
     q2: Vector;
-    c: Vector;
     q3: Vector;
     q4: Vector;
-    e: Vector;
+    p1: Vector;
+    p2: Vector;
+    p3: Vector;
+    p4: Vector;
 } => {
     let start: Vector;
     let end: Vector;
@@ -136,53 +138,62 @@ export const braceVectors = (
             throw new Error();
     }
 
-    const { x: dx, y: dy } = normalizedVector(connectionVector(end, start));
+    const { x: dx, y: dy } = normalizedVector(connectionVector(start, end));
+    const { x: nx, y: ny } = normalizedVector(orthogonalVector(connectionVector(start, end)));
+
     const length = vectorLength(connectionVector(end, start));
-    const stretch = 0.5;
-    const size = 40;
-    const dashSize = size * (1 / 6);
-    const bodySize = size * (2 / 3);
-    const normalizedOrthagonal = normalizedVector(orthogonalVector(connectionVector(start, end)));
 
-    const s = {
-        x: start.x + dashSize * normalizedOrthagonal.x,
-        y: start.y + dashSize * normalizedOrthagonal.y,
-    };
-
-    const e = {
-        x: end.x + dashSize * normalizedOrthagonal.x,
-        y: end.y + dashSize * normalizedOrthagonal.y,
-    };
-
-    const c = {
-        x: start.x - 0.5 * length * dx + bodySize * dy,
-        y: start.y - 0.5 * length * dy - bodySize * dx,
-    };
-
-    const tip = {
-        x: c.x + dashSize * normalizedOrthagonal.x,
-        y: c.y + dashSize * normalizedOrthagonal.y,
-    };
+    const height = 25;
 
     const q1 = {
-        x: start.x + stretch * bodySize * dy,
-        y: start.y - stretch * bodySize * dx,
+        x: start.x + dx * 0 + nx * (0.5 * height),
+        y: start.y + dy * 0 + ny * (0.5 * height),
+    };
+
+    const p1 = {
+        x: q1.x + dx * (0.5 * height) + nx * 0,
+        y: q1.y + dy * (0.5 * height) + nx * 0,
+    };
+
+    const p2 = {
+        x: start.x + dx * (0.5 * length - 0.5 * height) + nx * (0.5 * height),
+        y: start.y + dy * (0.5 * length - 0.5 * height) + ny * (0.5 * height),
     };
 
     const q2 = {
-        x: start.x - 0.25 * length * dx + (1 - stretch) * bodySize * dy,
-        y: start.y - 0.25 * length * dy - (1 - stretch) * bodySize * dx,
+        x: start.x + dx * (0.5 * length - 0.25 * height) + nx * 0.5 * height,
+        y: start.y + dy * (0.5 * length - 0.25 * height) + ny * 0.5 * height,
+    };
+
+    const c = {
+        x: start.x + dx * (length / 2) + nx * height,
+        y: start.y + dy * (length / 2) + ny * height,
+    };
+
+    const tip = {
+        x: start.x + dx * (length / 2) + nx * (1.75 * height),
+        y: start.y + dy * (length / 2) + ny * (1.75 * height),
     };
 
     const q3 = {
-        x: end.x + stretch * bodySize * dy,
-        y: end.y - stretch * bodySize * dx,
+        x: end.x - dx * (0.5 * length - 0.25 * height) + nx * 0.5 * height,
+        y: end.y - dy * (0.5 * length - 0.25 * height) + ny * 0.5 * height,
+    };
+
+    const p3 = {
+        x: end.x - dx * (0.5 * length - 0.5 * height) + nx * (0.5 * height),
+        y: end.y - dy * (0.5 * length - 0.5 * height) + ny * (0.5 * height),
+    };
+
+    const p4 = {
+        x: end.x - dx * (0.5 * height) + nx * (0.5 * height),
+        y: end.y - dy * (0.5 * height) + ny * (0.5 * height),
     };
 
     const q4 = {
-        x: start.x - 0.75 * length * dx + (1 - stretch) * bodySize * dy,
-        y: start.y - 0.75 * length * dy - (1 - stretch) * bodySize * dx,
+        x: end.x - dx * 0 + nx * (0.5 * height),
+        y: end.y - dy * 0 + ny * (0.5 * height),
     };
 
-    return { start, tip, end, s, q1, q2, c, q3, q4, e };
+    return { start, tip, end, c, q1, q2, q3, q4, p1, p2, p3, p4 };
 };

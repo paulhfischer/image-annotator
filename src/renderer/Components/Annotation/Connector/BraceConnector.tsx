@@ -31,7 +31,7 @@ function BraceConnector({
     const outline = useMemo(() => lineWidth / 2, [lineWidth]);
 
     const pathDirections: PathDirection[] = useMemo(() => {
-        const { start, tip, end, s, q1, q2, c, q3, q4, e } = braceVectors(
+        const { start, tip, end, c, q1, q2, q3, q4, p1, p2, p3, p4 } = braceVectors(
             pointA,
             pointB,
             orientation,
@@ -39,14 +39,14 @@ function BraceConnector({
 
         const directions: PathDirection[] = [
             { command: 'move', target: start },
-            { command: 'line', target: s },
-            { command: 'quadraticBezier', start: q1, end: q2 },
-            { command: 'smoothQuadraticBezier', target: c },
+            { command: 'quadraticBezier', start: q1, end: p1 },
+            { command: 'line', target: p2 },
+            { command: 'quadraticBezier', start: q2, end: c },
 
             { command: 'move', target: end },
-            { command: 'line', target: e },
-            { command: 'quadraticBezier', start: q3, end: q4 },
-            { command: 'smoothQuadraticBezier', target: c },
+            { command: 'quadraticBezier', start: q4, end: p4 },
+            { command: 'line', target: p3 },
+            { command: 'quadraticBezier', start: q3, end: c },
 
             { command: 'move', target: c },
             { command: 'line', target: tip },
