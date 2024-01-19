@@ -1,5 +1,5 @@
 import type { ContextBridge } from '@common/ContextBridge';
-import { ImageType, NewAnnotationType, NewImageType } from '@common/types';
+import { ImageType, NewAnnotationType, NewImageType, NewNodeType } from '@common/types';
 import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('ContextBridge', <ContextBridge>{
@@ -14,4 +14,6 @@ contextBridge.exposeInMainWorld('ContextBridge', <ContextBridge>{
     deleteImageInDB: (image: ImageType) => ipcRenderer.invoke('deleteImageInDB', { image }),
     createAnnotationInDB: (annotation: NewAnnotationType, imageID: number) =>
         ipcRenderer.invoke('createAnnotationInDB', { annotation, imageID }),
+    createNodeInDB: (node: NewNodeType, annotationID: number) =>
+        ipcRenderer.invoke('createNodeInDB', { node, annotationID }),
 });

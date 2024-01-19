@@ -1,4 +1,11 @@
-import { AnnotationType, ImageType, NewAnnotationType, NewImageType } from '@common/types';
+import {
+    AnnotationType,
+    ImageType,
+    NewAnnotationType,
+    NewImageType,
+    NewNodeType,
+    NodeType,
+} from '@common/types';
 import { ImageMeta } from '../main/openImage';
 
 export interface ContextBridge {
@@ -12,4 +19,5 @@ export interface ContextBridge {
     updateImageInDB: (img: ImageType) => Promise<ImageType>;
     deleteImageInDB: (img: ImageType) => Promise<void>;
     createAnnotationInDB: (ann: NewAnnotationType, imgID: number) => Promise<AnnotationType>;
+    createNodeInDB: (node: NewNodeType, annotationID: number) => Promise<NodeType>;
 }

@@ -22,6 +22,14 @@ import { useAppContext } from '../Context';
 import { getAnnotationByID } from '../Context/reducer/annotation';
 import { getImageByID } from '../Context/reducer/image';
 import { getNodeByID } from '../Context/reducer/node';
+import {
+    angleDeg,
+    connectionVector,
+    orientationToAngle,
+    rotateVector,
+    vectorLength,
+} from './Annotation/Connector/common/utils';
+import { getFontSize } from './ImageViewer/utils';
 
 const DeleteIcon = bundleIcon(DeleteFilled, DeleteRegular);
 
@@ -92,12 +100,35 @@ function AnnotationEdit() {
                 : undefined,
         [selectedNodeID, selectedAnnotation],
     );
+    const tipAngle = useMemo(() => {
+        if (!selectedImage) return undefined;
+        if (!selectedAnnotation) return undefined;
+        if (selectedAnnotation.type !== 'line') return undefined;
+        if (selectedAnnotation.tipType !== 'arrow') return undefined;
+        if (selectedAnnotation.endNodes.length !== 1) return undefined;
+        if (!selectedAnnotation.connectionNode) return 0;
+
+        const distance = vectorLength(
+            connectionVector(selectedAnnotation.connectionNode, selectedAnnotation.endNodes[0]),
+        );
+
+        if (Math.abs(distance - getFontSize(selectedImage) * 2) > 0.1) return undefined;
+
+        return (
+            (Math.round(
+                angleDeg(selectedAnnotation.connectionNode, selectedAnnotation.endNodes[0]),
+            ) -
+                orientationToAngle(selectedAnnotation.labelPosition)) %
+            360
+        );
+    }, [selectedImage, selectedAnnotation]);
 
     const annotationTypeID = useId();
     const annotationUIDID = useId();
     const annotationLabelID = useId();
     const annotationLabelPositionID = useId();
     const annotationTipTypeID = useId();
+    const annotationTipAngleID = useId();
     const nodeXID = useId();
     const nodeYID = useId();
 
@@ -193,6 +224,42 @@ function AnnotationEdit() {
         };
 
         dispatch({ type: 'UPDATE_ANNOTATION', payload: updatedAnnotation });
+    };
+
+    const handleUpdateTipAngle = async (
+        event: ChangeEvent<HTMLInputElement>,
+        data: InputOnChangeData,
+    ): Promise<void> => {
+        if (selectedAnnotation.type !== 'line') throw new Error();
+
+        const connectionNode = rotateVector(
+            {
+                x: selectedAnnotation.endNodes[0].x,
+                y: selectedAnnotation.endNodes[0].y + getFontSize(selectedImage) * 2,
+            },
+            selectedAnnotation.endNodes[0],
+            (parseInt(data.value, 10) || 0) + orientationToAngle(selectedAnnotation.labelPosition),
+        );
+
+        if (selectedAnnotation.connectionNode) {
+            dispatch({
+                type: 'UPDATE_NODE',
+                payload: {
+                    ...selectedAnnotation.connectionNode,
+                    ...connectionNode,
+                },
+            });
+        } else {
+            const newNode = await window.ContextBridge.createNodeInDB(
+                connectionNode,
+                selectedAnnotation.id,
+            );
+
+            dispatch({
+                type: 'UPDATE_ANNOTATION',
+                payload: { ...selectedAnnotation, connectionNode: newNode },
+            });
+        }
     };
 
     const handleUpdatePermanent = async (
@@ -323,6 +390,21 @@ function AnnotationEdit() {
                     <option>arrow</option>
                 </Select>
             </div>
+            {tipAngle !== undefined && (
+                <div className={classes.row}>
+                    <Label size="small" htmlFor={annotationTipAngleID}>
+                        angle
+                    </Label>
+                    <Input
+                        id={nodeXID}
+                        size="small"
+                        type="number"
+                        step={5}
+                        value={tipAngle.toString()}
+                        onChange={handleUpdateTipAngle}
+                    />
+                </div>
+            )}
             <div className={classes.row}>
                 <Button size="small" onClick={handleDeleteAnnotation} icon={<DeleteIcon />}>
                     delete annotation

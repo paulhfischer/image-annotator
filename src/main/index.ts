@@ -2,7 +2,7 @@ import { app, BrowserWindow, ipcMain } from 'electron';
 import unhandled from 'electron-unhandled';
 import { join } from 'path';
 
-import { ImageType, NewAnnotationType, NewImageType } from '@common/types';
+import { ImageType, NewAnnotationType, NewImageType, NewNodeType } from '@common/types';
 import { createAnnotationInDB } from './database/annotations';
 import createDB from './database/create';
 import {
@@ -12,6 +12,7 @@ import {
     fetchImagesFromDB,
     updateImageInDB,
 } from './database/images';
+import { createNodeInDB } from './database/nodes';
 import { openImage } from './openImage';
 import saveFile from './saveFile';
 
@@ -72,6 +73,11 @@ const registerIpcEventListeners = () => {
         'createAnnotationInDB',
         async (_, { annotation, imageID }: { annotation: NewAnnotationType; imageID: number }) =>
             createAnnotationInDB(annotation, imageID),
+    );
+    ipcMain.handle(
+        'createNodeInDB',
+        async (_, { node, annotationID }: { node: NewNodeType; annotationID: number }) =>
+            createNodeInDB(node, annotationID),
     );
 };
 
