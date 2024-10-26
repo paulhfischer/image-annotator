@@ -1,57 +1,58 @@
-import { hasColumn, runDB } from './utils';
+import { runDB } from './utils';
 
 const createDB = async (): Promise<void> => {
     await runDB(`
         CREATE TABLE IF NOT EXISTS images (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            uid TEXT NOT NULL UNIQUE,
+            uid TEXT UNIQUE NOT NULL,
             name TEXT NOT NULL,
-            clean_content TEXT NOT NULL,
-            annotated_content TEXT NULL,
-            annotation_size TEXT NOT NULL,
+            content TEXT NOT NULL,
             width INTEGER NOT NULL,
-            height INTEGER NOT NULL
-        )
+            height INTEGER NOT NULL,
+            group TEXT NOT NULL
+        );
     `);
-    if (!(await hasColumn('images', 'group_name'))) {
-        await runDB(`
-            ALTER TABLE images
-            ADD COLUMN group_name TEXT NULL;
-        `);
-    }
 
     await runDB(`
         CREATE TABLE IF NOT EXISTS annotations (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            uid TEXT NOT NULL UNIQUE,
-            type TEXT NOT NULL,
-            label TEXT NOT NULL,
-            label_position TEXT NOT NULL,
-            image INTEGER NOT NULL,
-            special_node INTEGER NULL,
-            permanent BOOLEAN NOT NULL
-        )
+            image_id TEXT NOT NULL,
+            annotation_type TEXT NOT NULL,
+            text TEXT NOT NULL,
+            disabled INTEGER NOT NULL DEFAULT 0,
+            FOREIGN KEY(image_id) REFERENCES images(id)
+        );
     `);
-    if (!(await hasColumn('annotations', 'tip'))) {
-        await runDB(`
-            ALTER TABLE annotations
-            ADD COLUMN tip TEXT NOT NULL DEFAULT "circle";
-        `);
-    }
-    if (!(await hasColumn('annotations', 'tip_angle'))) {
-        await runDB(`
-            ALTER TABLE annotations
-            ADD COLUMN tip_angle INTEGER NOT NULL DEFAULT 0;
-        `);
-    }
 
     await runDB(`
-        CREATE TABLE IF NOT EXISTS nodes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            annotation INTEGER NOT NULL,
-            x INTEGER NOT NULL,
-            y INTEGER NOT NULL
-        )
+        CREATE TABLE IF NOT EXISTS brace_annotations (
+            id INTEGER PRIMARY KEY,
+            annotation_id INTEGER,
+            tips TEXT NOT NULL,
+            FOREIGN KEY(annotation_id) REFERENCES annotations(id)
+        );
+    `);
+
+    await runDB(`
+        CREATE TABLE IF NOT EXISTS single_connector_annotations (
+            id INTEGER PRIMARY KEY,
+            annotation_id INTEGER,
+            tip TEXT NOT NULL,
+            angle REAL NOT NULL,
+            style TEXT NOT NULL CHECK (style IN ('arrow', 'circle')),
+            FOREIGN KEY(annotation_id) REFERENCES annotations(id)
+        );
+    `);
+
+    await runDB(`
+        CREATE TABLE IF NOT EXISTS multi_connector_annotations (
+            id INTEGER PRIMARY KEY,
+            annotation_id INTEGER,
+            tips TEXT NOT NULL,
+            connection TEXT NOT NULL,
+            style TEXT NOT NULL CHECK (style IN ('arrow', 'circle')),
+            FOREIGN KEY(annotation_id) REFERENCES annotations(id)
+        );
     `);
 };
 

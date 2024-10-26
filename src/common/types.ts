@@ -1,6 +1,11 @@
+export type PointType = {
+    x: number;
+    y: number;
+};
+
 export type NewImageType = {
     name: string;
-    cleanContent: string;
+    content: string;
     width: number;
     height: number;
 };
@@ -10,61 +15,44 @@ export type ImageType = {
     meta: {
         width: number;
         height: number;
-        cleanContent: string;
-        annotatedContent?: string;
+        content: string;
     };
     name: string;
-    annotationSize: 'small' | 'medium' | 'large';
     annotations: AnnotationType[];
     group: string;
 };
 
-export type NewAnnotationType =
-    | {
-          type: 'line';
-          labelPosition: 'top' | 'right' | 'bottom' | 'left';
-          endNodes: NewNodeType[];
-          connectionNode?: NewNodeType;
-      }
-    | {
-          type: 'brace';
-          labelPosition: 'top' | 'right' | 'bottom' | 'left';
-          nodeA: NewNodeType;
-          nodeB: NewNodeType;
-          connectionNode?: NewNodeType;
-      };
-export type AnnotationType =
-    | {
-          id: number;
-          uid: string;
-          type: 'line';
-          label: string;
-          labelPosition: 'top' | 'right' | 'bottom' | 'left';
-          endNodes: NodeType[];
-          connectionNode?: NodeType;
-          permanent: boolean;
-          tipType: 'circle' | 'arrow';
-          tipAngle: number;
-      }
-    | {
-          id: number;
-          uid: string;
-          type: 'brace';
-          label: string;
-          labelPosition: 'top' | 'right' | 'bottom' | 'left';
-          nodeA: NodeType;
-          nodeB: NodeType;
-          connectionNode?: NodeType;
-          permanent: boolean;
-          tipType: 'circle' | 'arrow';
-      };
-
-export type NewNodeType = {
-    x: number;
-    y: number;
-};
-export type NodeType = {
+export type BraceAnnotationType = {
     id: number;
-    x: number;
-    y: number;
+    type: 'brace';
+    tips: [PointType, PointType];
+    text: string;
+    disabled: boolean;
 };
+
+export type SingleConnectorAnnotationType = {
+    id: number;
+    type: 'single-connector';
+
+    text: string;
+    tip: PointType;
+    angle: number;
+    style: 'arrow' | 'circle';
+    disabled: boolean;
+};
+
+export type MultiConnectorAnnotationType = {
+    id: number;
+    type: 'multi-connector';
+
+    text: string;
+    tips: PointType[];
+    connectionPoint: PointType;
+    style: 'arrow' | 'circle';
+    disabled: boolean;
+};
+
+export type AnnotationType =
+    | SingleConnectorAnnotationType
+    | MultiConnectorAnnotationType
+    | BraceAnnotationType;

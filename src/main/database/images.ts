@@ -1,69 +1,59 @@
 import { ImageType, NewImageType } from '@common/types';
-import { deleteAnnotationInDB, fetchAnnotationsFromDB, updateAnnotationInDB } from './annotations';
+import {
+    deleteAnnotationInDB,
+    fetchAnnotationsFromDB as getAnnotationsFromDB,
+    updateAnnotationInDB,
+} from './annotations';
 import { queryDB, runDB } from './utils';
 
 type ImageDBType = {
     id: number;
     uid: string;
     name: string;
-    clean_content: string;
-    annotated_content: string | null;
-    annotation_size: string;
+    content: string;
     width: number;
     height: number;
-    group_name: string | null;
+    group_name: string;
 };
 
-const getUniqueImageID = async (): Promise<string> => {
+const generateUniqueImageID = async (): Promise<string> => {
     const id = Math.random().toString(36).slice(-8);
 
     const result = await queryDB<{ count: number }>(
-        `SELECT COUNT(*) as count FROM images WHERE uid = ?`,
+        `SELECT COUNT(*) as count FROM images WHERE id = ?`,
         [id],
     );
 
     if (result[0].count === 0) {
         return id;
     }
-    return getUniqueImageID();
+    return generateUniqueImageID();
 };
 
 const entryToType = async (entry: ImageDBType): Promise<ImageType> => {
-    if (
-        entry.annotation_size !== 'small' &&
-        entry.annotation_size !== 'medium' &&
-        entry.annotation_size !== 'large'
-    ) {
-        throw new Error();
-    }
-
     return {
         id: entry.id,
         uid: entry.uid,
         meta: {
             width: entry.width,
             height: entry.height,
-            cleanContent: entry.clean_content,
-            ...(entry.annotated_content !== null && {
-                annotatedContent: entry.annotated_content,
-            }),
+            content: entry.content,
         },
         name: entry.name,
-        annotationSize: entry.annotation_size,
-        annotations: await fetchAnnotationsFromDB(entry.id),
-        group: entry.group_name || '',
+        annotations: await getAnnotationsFromDB(entry.id),
+        group: entry.group_name,
     };
 };
 
-export const fetchImageFromDB = async (imageID: number): Promise<ImageType> => {
-    const imagesResult = await queryDB<ImageDBType>(`SELECT * FROM images WHERE id = ?`, [imageID]);
+export const getImageFromDB = async (id: number): Promise<ImageType> => {
+    const result = await queryDB<ImageDBType>(`SELECT * FROM images WHERE id = ?`, [id]);
 
-    if (imagesResult.length !== 1) throw new Error();
+    if (result.length !== 1) throw new Error();
 
-    return entryToType(imagesResult[0]);
+    return entryToType(result[0]);
 };
 
-export const fetchImagesFromDB = async (): Promise<ImageType[]> => {
+export const getImagesFromDB = async (): Promise<ImageType[]> => {
     const imagesResult = await queryDB<ImageDBType>(`SELECT * FROM images`);
 
     return Promise.all(imagesResult.map((entry) => entryToType(entry)));
@@ -71,24 +61,18 @@ export const fetchImagesFromDB = async (): Promise<ImageType[]> => {
 
 export const createImageInDB = async (image: NewImageType): Promise<ImageType> => {
     const result = await runDB(
-        `INSERT INTO images (uid, name, clean_content, annotated_content, annotation_size, width, height, group_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        [
-            await getUniqueImageID(),
-            image.name,
-            image.cleanContent,
-            null,
-            'medium',
-            image.width,
-            image.height,
-            null,
-        ],
+        `
+        INSERT INTO images (uid, name, content, width, height, group)
+        VALUES (?, ?, ?, ?)
+    `,
+        [await generateUniqueImageID(), image.name, image.content, image.width, image.height, ''],
     );
 
-    return fetchImageFromDB(result.lastID);
+    return getImageFromDB(result.lastID);
 };
 
 export const updateImageInDB = async (image: ImageType): Promise<ImageType> => {
-    const oldAnnotations = await fetchAnnotationsFromDB(image.id);
+    const oldAnnotations = await getAnnotationsFromDB(image.id);
     const newAnnotations = image.annotations;
 
     const removedAnnotations = oldAnnotations.filter(
