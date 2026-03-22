@@ -1,0 +1,9 @@
+{
+  "display_name": "AnkiImageAnnotator",
+  "module_name": "anki",
+  "repo_name": "anki-image-annotator",
+  "ankiweb_id": "n/a",
+  "author": "Paul Fischer",
+  "conflicts": [],
+  "targets": ["anki21"]
+}
