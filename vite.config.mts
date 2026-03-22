@@ -1,6 +1,6 @@
 import react from '@vitejs/plugin-react';
 import { rmSync } from 'fs';
-import { join } from 'path';
+import { join, resolve as pathResolve } from 'path';
 import { defineConfig, type AliasOptions } from 'vite';
 import electron from 'vite-plugin-electron';
 import renderer from 'vite-plugin-electron-renderer';
@@ -23,7 +23,7 @@ export default defineConfig(({ command }) => {
     return {
         root: 'src/renderer',
         build: {
-            outDir: '../../dist-renderer',
+            outDir: pathResolve(__dirname, '../../dist-renderer'),
             chunkSizeWarningLimit: 1000,
             emptyOutDir: true,
         },
@@ -32,7 +32,7 @@ export default defineConfig(({ command }) => {
             react(),
             electron([
                 {
-                    entry: 'src/main/index.ts',
+                    entry: pathResolve(__dirname, 'src/main/index.ts'),
                     onstart(options) {
                         options.startup();
                     },
@@ -41,7 +41,7 @@ export default defineConfig(({ command }) => {
                         build: {
                             sourcemap,
                             minify: isBuild,
-                            outDir: 'dist-main',
+                            outDir: pathResolve(__dirname, 'dist-main'),
                             rollupOptions: {
                                 external: Object.keys(
                                     'dependencies' in pkg ? pkg.dependencies : {},
@@ -51,7 +51,7 @@ export default defineConfig(({ command }) => {
                     },
                 },
                 {
-                    entry: 'src/preload/index.ts',
+                    entry: pathResolve(__dirname, 'src/preload/index.ts'),
                     onstart(options) {
                         options.reload();
                     },
@@ -60,7 +60,7 @@ export default defineConfig(({ command }) => {
                         build: {
                             sourcemap: sourcemap ? 'inline' : undefined,
                             minify: isBuild,
-                            outDir: 'dist-preload',
+                            outDir: pathResolve(__dirname, 'dist-preload'),
                             rollupOptions: {
                                 external: Object.keys(
                                     'dependencies' in pkg ? pkg.dependencies : {},
